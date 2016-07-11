@@ -1,10 +1,10 @@
-# Dformed
+# DFormed
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/dformed`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+DFormed is a dynamic form generation framework written in Ruby to be fully compatible as with Opal. This means the code that writes the forms is the same on both the server and the client.
 
 ## Installation
+
+__Important Note:__ This gem is not yet available on RubyGems.org. For now, clone this repo and use gem to build and install the gem or use the __specific_install__ gem to make life even easier.
 
 Add this line to your application's Gemfile:
 
@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Usage documentation will come as this library enters the first stable release.
 
 ## Development
 
@@ -38,4 +38,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
