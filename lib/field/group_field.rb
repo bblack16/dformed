@@ -3,23 +3,18 @@ module DFormed
   # A field that has multiple inputs
   # Such as key value pair type fields
   class GroupField < Field
-    attr_reader :fields, :vertical, :field_template
+    attr_reader :fields, :vertical
 
     def fields= fields
       @fields = Array.new
       fields.each do |f|
         field = (f.is_a?(Field) ? f : Field.create(f))
-        field.html_template = @field_template
         @fields.push field
       end
     end
 
     def vertical= v
       @vertical = v == true
-    end
-
-    def field_template= t
-      @field_template = t.to_s
     end
 
     def self.type
@@ -39,24 +34,24 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        row = Element[@html_template]
-        if @html_template.include?('label')
-          if row.find('.label').size > 0
-            row.find('.label').append(@label.to_element)
-          else
-            row.append(@label.to_element)
-          end
-        end
-        if @html_template.include?('field')
-          if row.find('.field').size > 0
-            row.find('.field').append(@fields.map{ |f| f.to_element })
-          else
-            row.append(@fields.map{ |f| f.to_element })
-          end
-        end
-        @element = row
-        register_events
-        @element
+        # row = Element[@html_template]
+        # if @html_template.include?('label')
+        #   if row.find('.label').size > 0
+        #     row.find('.label').append(@label.to_element)
+        #   else
+        #     row.append(@label.to_element)
+        #   end
+        # end
+        # if @html_template.include?('field')
+        #   if row.find('.field').size > 0
+        #     row.find('.field').append(@fields.map{ |f| f.to_element })
+        #   else
+
+          # end
+        # end
+        @element = super.append(@fields.map{ |f| f.to_element })
+        # register_events
+        # @element
       end
 
       def retrieve_values
@@ -71,17 +66,16 @@ module DFormed
     protected
 
       def inner_html
-        labels = @fields.map{ |f| "<th>#{f.label.to_html}</th>" }.join
-        fields = @fields.map do |f|
-          "<td>#{f.to_html}</td>"
-        end.join
-        @html_template.gsub(/\$label/i, labels).gsub(/\$fields/i, fields)
+        # labels = @fields.map{ |f| "<th>#{f.label.to_html}</th>" }.join
+        # fields = @fields.map do |f|
+          # "<td>#{f.to_html}</td>"
+        # end.join
+        # @html_template.gsub(/\$label/i, labels).gsub(/\$fields/i, fields)
       end
 
       def setup_vars
         super
         @fields = Array.new
-        @field_template = '<td class="field"></td>'
         @vertical = false
       end
 
@@ -92,10 +86,6 @@ module DFormed
             vertical: { send: :vertical, unless: false }
           }
         )
-      end
-
-      def label_to_h
-        @label.to_h
       end
 
       def fields_to_h

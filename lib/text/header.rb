@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Header < ElementBase
+  class Header < FormElement
     attr_reader :title
 
     def title= title

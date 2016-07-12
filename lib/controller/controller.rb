@@ -8,7 +8,8 @@ module DFormed
     end
 
     def add form, id
-      @forms[id.to_s] = Form.new(form)
+      form[:type] = :form unless form.include?(:type)
+      @forms[id.to_s] = ElementBase.create(form, nil)
     end
 
     def form id

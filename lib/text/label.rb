@@ -2,13 +2,19 @@
 module DFormed
 
   class Label < ElementBase
+    include Connectable
     attr_reader :name
 
     def name= lbl
       @name = lbl.to_s
     end
 
+    def self.type
+      :label
+    end
+
     alias_method :label=, :name=
+    alias_method :value=, :name=
 
     protected
 
@@ -27,9 +33,12 @@ module DFormed
       end
 
       def serialize_fields
-        {
-          name: { send: :name }
-        }
+        super.merge(
+          {
+            name: { send: :name },
+            type: { send: :type }
+          }
+        )
       end
 
   end

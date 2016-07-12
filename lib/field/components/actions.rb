@@ -21,11 +21,11 @@ module DFormed
       end
 
       def self.add_class field, args
-        [args].flatten.each{ |arg| field.element[field.tagname].add_class arg }
+        [args].flatten.each{ |arg| field.add_class arg }
       end
 
       def self.remove_class field, args
-        [args].flatten.each{ |arg| field.element[field.tagname].remove_class arg }
+        [args].flatten.each{ |arg| field.remove_class arg }
       end
 
       def self.add_style field, args
@@ -36,14 +36,14 @@ module DFormed
           end.to_h
         end
         if args.is_a?(Hash)
-          args.each{ |k,v| field.element.find(field.tagname).css(k, v) }
+          args.each{ |k,v| field.add_style(k, v) }
         else
           raise ArgumentError, "Args must be valid css or a hash of style => value pairs"
         end
       end
 
       def self.remove_style field, args
-        [args].flatten.each{ |arg| field.element.find(field.tagname).css(k, '') }
+        [args].flatten.each{ |arg| field.remove_style(k, '') }
       end
 
       def self.require field, args
@@ -55,10 +55,11 @@ module DFormed
       end
 
       def self.clear field, args
-        field.clear
+        field.clear if field.respond_to?(:clear)
       end
 
       def self.replace_with field, args
+        return unless field.respond_to?(:value)
         value = field.value
         if value.is_a? String
           field.value = args.to_s
@@ -68,6 +69,7 @@ module DFormed
       end
 
       def self.append field, args
+        return unless field.respond_to?(:value)
         value = field.value
         if value.is_a? String
           field.value = "#{value}#{args}"
@@ -77,6 +79,7 @@ module DFormed
       end
 
       def self.prepend field, args
+        return unless field.respond_to?(:value)
         value = field.value
         if value.is_a? String
           field.value = "#{args}#{value}"
@@ -86,7 +89,8 @@ module DFormed
       end
 
       def self.relabel field, arg
-        field.relabel arg
+        # field.relabel arg
+        # Probably deprecated and should not be used now that the Label class is a Connectable
       end
 
       def add_connection field, args

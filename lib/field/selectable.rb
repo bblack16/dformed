@@ -58,7 +58,7 @@ module DFormed
           index+=1
           checked = [value].flatten.include?(v)
           "#{new_col ? '<tr>' : nil}<td>" +
-          "<input type='#{self.type}' value='#{v}' name='#{@label}'#{checked ? ' checked' : nil}>#{c}</input>" +
+          "<input type='#{self.type}' value='#{v}' name='#{@name}'#{checked ? ' checked' : nil}>#{c}</input>" +
           "</td>#{index % @per_col == 0 ? '</tr>' : nil}"
         end.join
       end

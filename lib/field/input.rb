@@ -2,7 +2,7 @@
 module DFormed
 
   class Input < Field
-    attr_reader :required, :type
+    attr_reader :type
 
     INPUT_TYPES = [:text, :search, :tel, :color, :time, :datetime,
                     :date, :email, :password, :datetime_local, :number,
@@ -22,10 +22,6 @@ module DFormed
     def default= d
       super
       @attributes[:value] = value
-    end
-
-    def required= r
-      @required = r == true
     end
 
     def self.type
@@ -53,9 +49,6 @@ module DFormed
 
       def setup_vars
         super
-        @min = 1
-        @max = 1
-        @required = false
         @tagname = 'input'
       end
 

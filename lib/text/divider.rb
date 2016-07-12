@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Divider < ElementBase
+  class Divider < FormElement
 
     protected
 

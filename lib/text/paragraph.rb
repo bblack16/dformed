@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Paragraph < ElementBase
+  class Paragraph < FormElement
     attr_reader :body
 
     def body= body

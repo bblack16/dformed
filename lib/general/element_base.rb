@@ -2,7 +2,21 @@
 module DFormed
 
   class ElementBase < Base
-    attr_reader :classes, :attributes, :styles, :tagname, :element, :id
+    attr_reader :classes, :attributes, :styles, :tagname, :element, :id, :events
+
+    @@registry = nil
+
+    def self.registry
+      @@registry || Field.load_registry
+    end
+
+    def registry
+      @@registry || Field.load_registry
+    end
+
+    def type
+      DFormed.const_get(self.class.to_s).type rescue :abstract
+    end
 
     def id= id
       @id = id.to_s.strip.gsub(' ', '_')
@@ -56,6 +70,11 @@ module DFormed
       @element.css(k.to_s, '') if element?
     end
 
+    def register_event hash
+      @events[hash[:method]] = { event: hash[:event], selector: hash[:selector] }
+      register_events
+    end
+
     def to_html
       "<#{@tagname}#{compile_all}>#{inner_html}</#{@tagname}>"
     end
@@ -67,6 +86,12 @@ module DFormed
         @element = Element[to_html]
       end
 
+    end
+
+    def self.create hash, parent = nil
+      raise TypeError, 'Could not locate the appropriate class to instantiate a field.' unless registry.include?(hash[:type].to_sym)
+      hash[:parent] = parent
+      field = DFormed.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
     end
 
     protected
@@ -81,6 +106,8 @@ module DFormed
       end
 
       def setup_vars
+        FormElement.load_registry
+        @events = Hash.new
         @id = ''
         @classes = Array.new
         @attributes = Hash.new
@@ -97,7 +124,9 @@ module DFormed
           classes: { send: :classes, unless: [] },
           id: { send: :id, unless: '' },
           styles: { send: :styles, unless: {} },
-          attributes: { send: :attributes, unless: {} }
+          attributes: { send: :attributes, unless: {} },
+          events: { send: :events, unless: {} },
+          type: { send: :type }
         }
       end
 
@@ -131,6 +160,34 @@ module DFormed
 
       def element?
         DFormed.in_opal? && @element
+      end
+
+      def register_events
+        return nil unless element?
+        @events.each do |method, data|
+          [data[:event]].flatten.each do |evt|
+            [data[:selector]].flatten.each do |selector|
+              @element.on(evt, selector) do |event|
+                self.send(method)
+              end
+            end
+          end
+        end
+      end
+
+      def self.load_registry
+        return @@registry unless @@registry.nil?
+        @@registry = Hash.new
+        DFormed.constants.map do |c|
+          begin
+            [Object.const_get("DFormed::#{c}").type].flatten.each do |type|
+              @@registry[type] = c unless type == :abstract
+            end
+          rescue
+            # Nothing, load failed
+          end
+        end
+        @@registry
       end
 
   end
