@@ -1,7 +1,3 @@
-require_relative 'components/connection'
-require_relative 'components/operators'
-require_relative 'components/actions'
-require_relative 'components/validator'
 require_relative '_field'
 require_relative '_multi_field'
 require_relative 'input'

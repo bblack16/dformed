@@ -2,6 +2,7 @@
 module DFormed
 
   class Form < FormElement
+    include Valuable
     attr_reader :fields
 
     def field name
@@ -24,8 +25,23 @@ module DFormed
       @fields.delete_at(index)
     end
 
-    def values
-      @fields.map{ |f| f.respond_to?(:value) ? [f.name, f.value] : nil }.reject{ |r| r.nil? }.to_h
+    def value
+      @fields.map{ |f| f.respond_to?(:value) ? [f.name, f.value] : nil }
+        .reject{ |r| r.nil? }.to_h
+    end
+    
+    def value= values
+      @values = {}
+      set values
+    end
+    
+    def set hash
+      hash.each do |k, v|
+        field = @fields.find{ |f| f.name == k.to_s }
+        if field
+          field.value = v
+        end
+      end
     end
 
     def clear

@@ -1,0 +1,43 @@
+
+# This module is used for Elements that should contain a value
+# The methods added provide means of interacting with values from
+# a generic FormElement and can be overwritten in subclasses if needed
+module DFormed
+  
+  module Valuable
+    attr_reader :value, :default
+    @connections = Hash.new
+    @default = nil
+    
+    def value= val
+      @value = val
+      @element.find(@tagname).value = val if element?
+    end
+
+    def default= d
+      @default = d
+    end
+
+    def value
+      @value || @default
+    end
+    
+    def clear
+      value = ''
+      if element?
+        @element.find('input').value = ''
+      end
+    end
+    
+    if DFormed.in_opal?
+
+      def retrieve_values
+        return nil unless @element
+        self.value = @element.find(@tagname).value
+      end
+
+    end
+    
+  end
+  
+end

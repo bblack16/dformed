@@ -1,3 +1,5 @@
+require_relative 'connection'
+
 module DFormed
 
   module Connectable
@@ -22,6 +24,10 @@ module DFormed
       @connections.each do |con|
         con.compare(self, elem)
       end
+    end
+    
+    def serialize_connections
+      @connections.map{ |c| c.to_h }
     end
 
   end

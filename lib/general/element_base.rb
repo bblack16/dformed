@@ -23,8 +23,10 @@ module DFormed
     end
 
     def classes= klasses
-      @classes = klasses.map{ |m| m.to_s }
+      @classes = [klasses].flatten.map{ |m| m.to_s }
     end
+    
+    alias_method :class=, :classes=
 
     def add_class klass
       @classes.push klass
@@ -55,10 +57,13 @@ module DFormed
 
     def styles= a
       @styles = Hash.new
+      a = a.split(';').map{ |m| s = m.split(':'); [s[0].strip, s[1].strip]}.to_h if a.is_a?(String)
       a.each do |k,v|
         add_style k, v
       end
     end
+    
+    alias_method :style=, :styles=
 
     def add_style k, v
       @styles[k.to_s] = v.to_s

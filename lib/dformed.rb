@@ -16,10 +16,10 @@ end
 
 require_relative 'dformed/version'
 require_relative 'general/general'
-require_relative 'general/connectable'
 require_relative 'general/base'
 require_relative 'general/element_base'
 require_relative 'general/form_element'
+require_relative 'components/_components'
 require_relative 'text/_requires'
 require_relative 'form/_form'
 require_relative 'field/_requires'
