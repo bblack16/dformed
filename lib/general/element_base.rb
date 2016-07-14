@@ -56,7 +56,7 @@ module DFormed
 
     def remove_attribute k
       @attributes.delete k.to_sym
-      @element.remove_attr(k.to_s)
+      @element.remove_attr(k.to_s) if element?
     end
 
     def styles= a
@@ -100,7 +100,7 @@ module DFormed
     def self.create hash, parent = nil
       raise TypeError, 'Could not locate the appropriate class to instantiate a field.' unless registry.include?(hash[:type].to_sym)
       hash[:parent] = parent
-      field = DFormed.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
+      DFormed.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
     end
 
     protected

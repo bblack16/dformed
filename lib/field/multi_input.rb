@@ -11,17 +11,8 @@ module DFormed
     def type= type
       type = type.to_s.sub('multi_', '').to_sym
       @type = INPUT_TYPES.include?(type) ? type : :text
+      @template = Input.new(type: @type)
       @attributes[:type] = @type
-    end
-
-    def value= v
-      super
-      @attributes[:value] = value
-    end
-
-    def default= d
-      super
-      @attributes[:value] = value
     end
 
     def type
@@ -34,29 +25,24 @@ module DFormed
 
     protected
 
-      def inner_html
-        nil
-      end
-
       def setup_vars
         super
+        @template = Input.new(type: :text)
         @min = 1
         @max = 10
-        @label = 'Input'
-        @tagname = 'input'
       end
 
-      def increment
-        super
-        @attributes[:value] = value
-        @index
-      end
-
-      def reset
-        super
-        @attributes[:value] = value
-        @index
-      end
+      # def increment
+      #   super
+      #   @attributes[:value] = value
+      #   @index
+      # end
+      # 
+      # def reset
+      #   
+      #   @attributes[:value] = value
+      #   @index
+      # end
 
   end
 

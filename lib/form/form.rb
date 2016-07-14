@@ -11,21 +11,20 @@ module DFormed
 
     def add *hashes
       hashes.each do |hash|
-        elem = nil
         if hash[:type]
-          elem = ElementBase.create(hash, self)
+          add_elem hash
         else # Supports a slightly different shorthand for convenience
           hash.each do |k, v|
-            elem = ElementBase.create(v.merge(type: k), self)
+            add_elem v.merge(type: k)
           end
         end
-        elem.name = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
-        @fields.push elem
       end
     end
 
-    def remove index
-      @fields.delete_at(index)
+    def remove *names
+      names.map do |name|
+        @fields.delete_if{ |f| f.name.to_s == name.to_s }
+      end.flatten
     end
 
     def value
@@ -46,9 +45,17 @@ module DFormed
         end
       end
     end
+    
+    def get name
+      @fields.find{ |f| f.name.to_s == name.to_s }
+    end
+    
+    def vget name
+      get(name).value
+    end
 
     def clear
-      @fields.each{ |f| f.clear }
+      @fields.each{ |f| f.clear if f.respond_to?(:clear) }
     end
 
     def field_changed field
@@ -85,6 +92,12 @@ module DFormed
     end
 
     protected
+    
+      def add_elem hash
+        elem = ElementBase.create(hash, self)
+        elem.name = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
+        @fields.push elem
+      end
 
       def next_id
         (@last_id += 1).to_s

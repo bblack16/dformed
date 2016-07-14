@@ -24,6 +24,10 @@ module DFormed
       form(id).delete if DFormed.in_opal?
       remove id
     end
+    
+    def has_form? id
+      @forms.include?(id)
+    end
 
     def values id
       if DFormed.in_opal?
@@ -32,9 +36,13 @@ module DFormed
         form(id).value
       end
     end
+    
+    def set id, values
+      form(id).value = values
+    end
 
     def clear id
-      form(id).clear
+      form(id).clear if form(id).respond_to? :clear
     end
 
     if DFormed.in_opal?
@@ -44,20 +52,21 @@ module DFormed
         render id, selector
       end
 
-      def download_and_render url, id, selector
-        download url, id, selector
-      end
-
-      def download url, id, selector = false
+      def download url, id, selector = false, retain = true
+        retain = false if retain && !has_form?(id)
         HTTP.get url do |response|
           `console.log(#{response})`
+          values = values(id) if retain
           add response.json, id
-          render id, selector unless !selector
+          set id, values if retain
+          render id, selector, values if selector
         end
       end
 
       def render id, selector
-        Element[selector].first.append(form(id).to_element)
+        elem = Element[selector].first
+        elem.empty
+        elem.append(form(id).to_element)
       end
 
       def delete id

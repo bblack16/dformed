@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Textarea < Field
+  class TextArea < Field
 
     def self.type
       [:textarea, :text_area]

@@ -24,8 +24,9 @@ module DFormed
 
       def setup_vars
         super
-        @tagname = 'label'
-        @name = ''
+        @connections = Array.new
+        @tagname     = 'label'
+        @name        = ''
       end
 
       def custom_init *args

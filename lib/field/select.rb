@@ -6,6 +6,10 @@ module DFormed
     def self.type
       :select
     end
+    
+    def type
+      :select
+    end
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?

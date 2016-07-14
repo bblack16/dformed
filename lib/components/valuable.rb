@@ -23,9 +23,10 @@ module DFormed
     end
 
     def clear
-      value = ''
+      return if attributes.include?(:readonly)
+      value = nil
       if element?
-        @element.find('input').value = ''
+        @element.value = nil
       end
     end
 

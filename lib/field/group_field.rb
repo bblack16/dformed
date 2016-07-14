@@ -3,15 +3,24 @@ module DFormed
   # A field that has multiple inputs
   # Such as key value pair type fields
   class GroupField < Field
-    attr_reader :fields, :last_id
+    attr_reader :fields, :last_id, :labeled
+
+    def labeled= lbl
+        @labeled = lbl.to_s != 'false'
+    end
 
     def fields= fields
       @fields = Array.new
-      fields.each do |f|
-        field = (f.is_a?(Field) ? f : ElementBase.create(f))
-        field.name = next_id if field.respond_to?(:name=) && field.name.to_s == ''
-        @fields.push field
+      fields.each do |f, v|
+        if v.nil?
+          field = (f.is_a?(Field) ? f : ElementBase.create(f))
+          field.name = next_id if field.respond_to?(:name=) && field.name.to_s == ''
+          @fields.push field
+        else
+          @fields.push(ElementBase.create(v.merge(type: f)))
+        end
       end
+      @fields.each{ |f| f.add_attribute('dfield_name', f.name) }
     end
 
     def self.type
@@ -65,7 +74,8 @@ module DFormed
       def serialize_fields
         super.merge(
           {
-            fields: { send: :fields_to_h, unless: [] }
+            fields: { send: :fields_to_h, unless: [] },
+            labeled: { send: :labeled, unless: true }
           }
         )
       end
