@@ -3,10 +3,6 @@ module DFormed
 
   class VerticalForm < Form
 
-    def type
-      :vform
-    end
-
     def self.type
       [:vform, :vertical_form]
     end
@@ -26,6 +22,12 @@ module DFormed
             x+=2
           elsif @fields[x].is_a?(Label)
             row.find('.label').append(@fields[x].to_element)
+            x+=1
+          elsif @fields[x].is_a?(Separator)
+            row.empty
+            td = Element['<td colspan=2/>']
+            td.append @fields[x].to_element
+            row.append td
             x+=1
           else
             row.find('.field').append(@fields[x].to_element)

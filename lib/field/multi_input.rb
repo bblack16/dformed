@@ -2,7 +2,6 @@
 module DFormed
 
   class MultiInput < MultiField
-    attr_reader :required, :type
 
     INPUT_TYPES = [:text, :search, :tel, :color, :time, :datetime,
                     :date, :email, :password, :datetime_local, :number,
@@ -25,10 +24,6 @@ module DFormed
       @attributes[:value] = value
     end
 
-    def required= r
-      @required = r == true
-    end
-
     def type
       "multi_#{@type}".to_sym
     end
@@ -48,7 +43,6 @@ module DFormed
         @min = 1
         @max = 10
         @label = 'Input'
-        @required = false
         @tagname = 'input'
       end
 

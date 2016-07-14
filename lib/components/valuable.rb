@@ -3,15 +3,15 @@
 # The methods added provide means of interacting with values from
 # a generic FormElement and can be overwritten in subclasses if needed
 module DFormed
-  
+
   module Valuable
     attr_reader :value, :default
     @connections = Hash.new
     @default = nil
-    
+
     def value= val
       @value = val
-      @element.find(@tagname).value = val if element?
+      @element.value = val if element?
     end
 
     def default= d
@@ -21,23 +21,23 @@ module DFormed
     def value
       @value || @default
     end
-    
+
     def clear
       value = ''
       if element?
         @element.find('input').value = ''
       end
     end
-    
+
     if DFormed.in_opal?
 
-      def retrieve_values
+      def retrieve_value
         return nil unless @element
-        self.value = @element.find(@tagname).value
+        self.value = @element.value
       end
 
     end
-    
+
   end
-  
+
 end

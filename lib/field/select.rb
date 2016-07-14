@@ -7,15 +7,11 @@ module DFormed
       :select
     end
 
-    def type
-      :select
-    end
-
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
-      def retrieve_values
-        self.value = @element.find('select').value
+      def retrieve_value
+        self.value = @element.value
       end
 
     end
@@ -24,7 +20,6 @@ module DFormed
 
       def setup_vars
         super
-        @label = 'Select'
         @tagname = 'select'
       end
 

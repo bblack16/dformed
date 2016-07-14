@@ -15,7 +15,11 @@ module DFormed
     end
 
     def type
-      DFormed.const_get(self.class.to_s).type rescue :abstract
+      begin
+        [DFormed.const_get(self.class.to_s).type].flatten.first
+      rescue
+        :abstract
+      end
     end
 
     def id= id
@@ -25,7 +29,7 @@ module DFormed
     def classes= klasses
       @classes = [klasses].flatten.map{ |m| m.to_s }
     end
-    
+
     alias_method :class=, :classes=
 
     def add_class klass
@@ -62,7 +66,7 @@ module DFormed
         add_style k, v
       end
     end
-    
+
     alias_method :style=, :styles=
 
     def add_style k, v

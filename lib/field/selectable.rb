@@ -38,7 +38,7 @@ module DFormed
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
-      def retrieve_values
+      def retrieve_value
         case @type
         when :checkbox
           self.value = @element.find('input:checked').map{ |i| i.value }

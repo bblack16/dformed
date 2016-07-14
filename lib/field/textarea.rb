@@ -6,10 +6,6 @@ module DFormed
     def self.type
       [:textarea, :text_area]
     end
-    
-    def type
-      :textarea
-    end
 
     protected
 

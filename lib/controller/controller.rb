@@ -26,7 +26,11 @@ module DFormed
     end
 
     def values id
-      form(id).retrieve_values
+      if DFormed.in_opal?
+        form(id).retrieve_value
+      else
+        form(id).value
+      end
     end
 
     def clear id

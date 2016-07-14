@@ -1,7 +1,11 @@
 
 module DFormed
 
-  class Divider < FormElement
+  class Break < Separator
+
+    def self.type
+      [:break, :br]
+    end
 
     protected
 
@@ -12,10 +16,6 @@ module DFormed
       def setup_vars
         super
         @tagname = 'br'
-      end
-
-      def serialize_fields
-        {}
       end
 
   end

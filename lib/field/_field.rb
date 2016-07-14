@@ -8,10 +8,6 @@ module DFormed
       :abstract
     end
 
-    def type
-      :abstract
-    end
-
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
@@ -24,7 +20,7 @@ module DFormed
     end
 
     def refresh
-      retrieve_values
+      retrieve_value
       validate
     end
 

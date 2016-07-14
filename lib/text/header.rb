@@ -1,12 +1,24 @@
 
 module DFormed
 
-  class Header < FormElement
-    attr_reader :title
+  class Header < Separator
+    include Connectable
+    attr_reader :title, :size
+
+    def self.type
+      :header
+    end
+
+    def size= num
+      @size = num.to_i if (1..4) === num.to_i
+      @tagname = "h#{@size}"
+    end
 
     def title= title
       @title = title.to_s
     end
+
+    alias_method :value=, :title=
 
     protected
 
@@ -16,7 +28,7 @@ module DFormed
 
       def setup_vars
         super
-        @tagname = 'h1'
+        @size = 1
         @title = ''
       end
 
@@ -25,9 +37,13 @@ module DFormed
       end
 
       def serialize_fields
-        {
-          title: { send: :title }
-        }
+        super.merge(
+          {
+            title: { send: :title },
+            size: { send: :size, unless: 1 },
+            connections: { send: :serialize_connections, unless: [] }
+          }
+        )
       end
 
   end

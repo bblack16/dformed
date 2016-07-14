@@ -16,10 +16,6 @@ module DFormed
       @description = t.to_s
     end
 
-    def html_template= temp
-      @html_template = temp.to_s
-    end
-
     protected
 
 

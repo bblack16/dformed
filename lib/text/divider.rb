@@ -1,7 +1,11 @@
 
 module DFormed
 
-  class Divider < FormElement
+  class Divider < Separator
+
+    def self.type
+      [:divider, :hr, :horizontal_reference]
+    end
 
     protected
 
@@ -12,10 +16,6 @@ module DFormed
       def setup_vars
         super
         @tagname = 'hr'
-      end
-
-      def serialize_fields
-        {}
       end
 
   end

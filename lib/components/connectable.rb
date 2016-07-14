@@ -4,9 +4,9 @@ module DFormed
 
   module Connectable
     attr_reader :connections
-    @connections = Hash.new
 
     def add_connection c
+      @connections = Hash.new unless @connections
       [c].flatten(1).each do |con|
         con = Connection.new(con) if con.is_a?(Hash)
         @connections << con if con.is_a?(Connection)
@@ -25,8 +25,9 @@ module DFormed
         con.compare(self, elem)
       end
     end
-    
+
     def serialize_connections
+      return [] unless @connections
       @connections.map{ |c| c.to_h }
     end
 

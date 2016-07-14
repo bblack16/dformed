@@ -3,7 +3,7 @@ module DFormed
 
   class Form < FormElement
     include Valuable
-    attr_reader :fields
+    attr_reader :fields, :last_id
 
     def field name
       @fields.find{ |f| f.name == name } rescue nil
@@ -11,13 +11,16 @@ module DFormed
 
     def add *hashes
       hashes.each do |hash|
+        elem = nil
         if hash[:type]
-          @fields.push ElementBase.create(hash, self)
+          elem = ElementBase.create(hash, self)
         else # Supports a slightly different shorthand for convenience
           hash.each do |k, v|
-            @fields.push ElementBase.create(v.merge(type: k), self)
+            elem = ElementBase.create(v.merge(type: k), self)
           end
         end
+        elem.name = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
+        @fields.push elem
       end
     end
 
@@ -29,12 +32,12 @@ module DFormed
       @fields.map{ |f| f.respond_to?(:value) ? [f.name, f.value] : nil }
         .reject{ |r| r.nil? }.to_h
     end
-    
+
     def value= values
       @values = {}
       set values
     end
-    
+
     def set hash
       hash.each do |k, v|
         field = @fields.find{ |f| f.name == k.to_s }
@@ -70,8 +73,9 @@ module DFormed
         @element
       end
 
-      def retrieve_values
-        @fields.map{ |f| f.respond_to?(:retrieve_values) ? [f.name, f.retrieve_values] : nil }.reject{ |r| r.nil? }.to_h
+      def retrieve_value
+        @fields.map{ |f| f.respond_to?(:retrieve_value) ? [f.name, f.retrieve_value] : nil }
+          .reject{ |r| r.nil? }.to_h
       end
 
     end
@@ -80,11 +84,11 @@ module DFormed
       :form
     end
 
-    def type
-      :form
-    end
-
     protected
+
+      def next_id
+        (@last_id += 1).to_s
+      end
 
       def inner_html
         '<table class="fields"><tr>' +
@@ -95,6 +99,7 @@ module DFormed
       end
 
       def setup_vars
+        @last_id = 0
         super
         @fields = Array.new
         @element_type = 'div'

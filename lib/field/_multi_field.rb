@@ -22,10 +22,6 @@ module DFormed
       @per_col = pc.to_i <= 1 ? 1 : pc.to_i
     end
 
-    def self.type
-      :abstract
-    end
-
     def value
       @value[@index]
     end
@@ -36,11 +32,12 @@ module DFormed
 
     def to_html
       reset
+      '<div class="multi_container">' +
       values.map do |val|
         html = '<div class="multi_field">' + super + make_buttons + '</div>'
         increment
         html
-      end.join
+      end.join + '</div>'
     end
 
     # These methods are only available if the engine is Opal
@@ -53,7 +50,7 @@ module DFormed
       end
 
       def refresh_buttons
-        retrieve_values
+        retrieve_value
         @element.find('.multi_field').each_with_index do |elem, indx|
           elem.find('button').remove
           buttons = [
@@ -88,7 +85,7 @@ module DFormed
         refresh_buttons
       end
 
-      def retrieve_values
+      def retrieve_value
         @value = @element.find(@tagname).map{ |m| m.value }
       end
 

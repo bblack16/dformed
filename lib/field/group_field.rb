@@ -3,22 +3,19 @@ module DFormed
   # A field that has multiple inputs
   # Such as key value pair type fields
   class GroupField < Field
-    attr_reader :fields, :vertical
+    attr_reader :fields, :last_id
 
     def fields= fields
       @fields = Array.new
       fields.each do |f|
-        field = (f.is_a?(Field) ? f : Field.create(f))
+        field = (f.is_a?(Field) ? f : ElementBase.create(f))
+        field.name = next_id if field.respond_to?(:name=) && field.name.to_s == ''
         @fields.push field
       end
     end
 
-    def vertical= v
-      @vertical = v == true
-    end
-
     def self.type
-      [:group, :group_field]
+      [:group_field, :group]
     end
 
     def value= val
@@ -34,30 +31,13 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        # row = Element[@html_template]
-        # if @html_template.include?('label')
-        #   if row.find('.label').size > 0
-        #     row.find('.label').append(@label.to_element)
-        #   else
-        #     row.append(@label.to_element)
-        #   end
-        # end
-        # if @html_template.include?('field')
-        #   if row.find('.field').size > 0
-        #     row.find('.field').append(@fields.map{ |f| f.to_element })
-        #   else
-
-          # end
-        # end
         @element = super.append(@fields.map{ |f| f.to_element })
-        # register_events
-        # @element
       end
 
-      def retrieve_values
+      def retrieve_value
         return nil unless @element
         @value = @fields.map do |field|
-          [field.name, field.retrieve_values]
+          [field.name, field.retrieve_value]
         end.to_h
       end
 
@@ -65,25 +45,27 @@ module DFormed
 
     protected
 
+      def next_id
+        (@last_id += 1).to_s
+      end
+
       def inner_html
-        # labels = @fields.map{ |f| "<th>#{f.label.to_html}</th>" }.join
-        # fields = @fields.map do |f|
-          # "<td>#{f.to_html}</td>"
-        # end.join
-        # @html_template.gsub(/\$label/i, labels).gsub(/\$fields/i, fields)
+        return nil if DFormed.in_opal?
+        @fields.map do |f|
+          f.to_html
+        end.join
       end
 
       def setup_vars
+        @last_id = 0
         super
         @fields = Array.new
-        @vertical = false
       end
 
       def serialize_fields
         super.merge(
           {
-            fields: { send: :fields_to_h, unless: [] },
-            vertical: { send: :vertical, unless: false }
+            fields: { send: :fields_to_h, unless: [] }
           }
         )
       end

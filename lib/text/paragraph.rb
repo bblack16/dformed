@@ -1,12 +1,19 @@
 
 module DFormed
 
-  class Paragraph < FormElement
+  class Paragraph < Separator
+    include Connectable
     attr_reader :body
+
+    def self.type
+      [:paragraph, :p]
+    end
 
     def body= body
       @body = body.to_s
     end
+
+    alias_method :value=, :body=
 
     protected
 
@@ -25,9 +32,12 @@ module DFormed
       end
 
       def serialize_fields
-        {
-          body: { send: :body }
-        }
+        super.merge(
+          {
+            body: { send: :body },
+            connections: { send: :serialize_connections, unless: [] }
+          }
+        )
       end
 
   end
