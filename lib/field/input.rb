@@ -4,13 +4,14 @@ module DFormed
   class Input < Field
     attr_reader :type
 
-    INPUT_TYPES = [:text, :search, :tel, :color, :time, :datetime,
+    INPUT_TYPES = [
+                    :text, :search, :tel, :color, :time, :datetime,
                     :date, :email, :password, :datetime_local, :number,
                     :range, :week, :month, :url
                   ]
 
     def type= type
-      @type = INPUT_TYPES.include?(type) ? type : :text
+      @type              = INPUT_TYPES.include?(type) ? type : :text
       @attributes[:type] = @type
     end
 

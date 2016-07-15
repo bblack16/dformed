@@ -7,6 +7,7 @@ module DFormed
 
     def name= lbl
       @name = lbl.to_s
+      @element.text(@name) if element?
     end
 
     def self.type
@@ -15,7 +16,8 @@ module DFormed
 
     alias_method :label=, :name=
     alias_method :value=, :name=
-
+    alias_method :value, :name
+    
     protected
 
       def inner_html

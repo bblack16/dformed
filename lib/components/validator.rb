@@ -163,7 +163,7 @@ module DFormed
             options = (
               (letters.include?('i') ? Regexp::IGNORECASE : 0) |
               (letters.include?('m') ? Regexp::MULTILINE : 0) |
-              (letters.include?('m') ? Regexp::EXTENDED : 0)
+              (letters.include?('x') ? Regexp::EXTENDED : 0)
             )
             Regexp.new(obj[15..-2], options)
           elsif obj.start_with?('!range ')

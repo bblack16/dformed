@@ -34,10 +34,6 @@ module DFormed
         end.join("\n")
       end
 
-      def serialize_fields
-        super.merge(type: { send: :type })
-      end
-
   end
 
 end

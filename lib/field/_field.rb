@@ -40,18 +40,18 @@ module DFormed
         @validator = Validator.new
         @value = nil
         @default = nil
-        register_event method: :refresh, event: :change, selector: 'input, select, radio, checkbox, textarea'
-        register_event method: :updated, event: :change, selector: 'input, select, radio, checkbox, textarea'
+        register_event method: :refresh, event: :change, selector: nil
+        register_event method: :updated, event: :change, selector: nil
       end
 
       def serialize_fields
         super.merge(
           connections: { send: :serialize_connections, unless: [] },
-          validator: { send: :serialize_validator, unless: {} },
-          value: { send: :value, unless: @default },
-          default: { send: :default, unless: nil },
-          type: { send: :type },
-          events: { send: :events, unless: {refresh:{event: :change, selector: 'input, select, radio, checkbox, textarea'}, updated:{event: :change, selector: 'input, select, radio, checkbox, textarea'}}}
+          validator:   { send: :serialize_validator, unless: {} },
+          value:       { send: :value, unless: @default },
+          default:     { send: :default, unless: nil },
+          type:        { send: :type },
+          events:      { send: :events, unless: {refresh:{event: :change, selector: 'input, select, radio, checkbox, textarea'}, updated:{event: :change, selector: 'input, select, radio, checkbox, textarea'}}}
         )
       end
 

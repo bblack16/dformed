@@ -36,6 +36,12 @@ module DFormed
         super
         @tagname = 'button'
       end
+      
+      def serialize_fields
+        super.merge(
+          label: { send: :label }
+        )
+      end
     
   end
   

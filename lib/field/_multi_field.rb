@@ -37,7 +37,7 @@ module DFormed
     end
     
     def size
-      values.size
+      @fields.size
     end
     
     def add_value v = nil
@@ -127,8 +127,9 @@ module DFormed
 
       def add_button disabled = false
         return nil unless cloneable && (!disabled || !hide_buttons)
-        @buttons[:add].disable(disabled)
-        btn = @buttons[:add].to_element
+        btn = ElementBase.create(@buttons[:add].to_h)
+        btn.disable(disabled)
+        btn = btn.to_element
         btn.on :click do |evt|
           clone evt
         end
@@ -137,8 +138,9 @@ module DFormed
 
       def remove_button disabled = false
         return nil unless cloneable && (!disabled || !hide_buttons)
-        @buttons[:remove].disable(disabled)
-        btn = @buttons[:remove].to_element
+        btn = ElementBase.create(@buttons[:remove].to_h)
+        btn.disable(disabled)
+        btn = btn.to_element
         btn.on :click do |evt|
           chop evt
         end
@@ -147,8 +149,9 @@ module DFormed
 
       def up_button disabled = false
         return nil unless moveable && (!disabled || !hide_buttons)
-        @buttons[:up].disable(disabled)
-        btn = @buttons[:up].to_element
+        btn = ElementBase.create(@buttons[:up].to_h)
+        btn.disable(disabled)
+        btn = btn.to_element
         btn.on :click do |evt|
           move evt, :up
         end
@@ -157,8 +160,9 @@ module DFormed
 
       def down_button disabled = false
         return nil unless moveable && (!disabled || !hide_buttons)
-        @buttons[:down].disable(disabled)
-        btn = @buttons[:down].to_element
+        btn = ElementBase.create(@buttons[:down].to_h)
+        btn.disable(disabled)
+        btn = btn.to_element
         btn.on :click do |evt|
           move evt, :down
         end
@@ -185,7 +189,7 @@ module DFormed
       
       def default_buttons
         {
-          add:    DFormed::Button.new(label: '+'),
+          add:    DFormed::Button.new(label: '<span class="glyphicon glyphicon-plus" style="color:green"/>'),
           remove: DFormed::Button.new(label: '-'),
           up:     DFormed::Button.new(label: '^'),
           down:   DFormed::Button.new(label: 'v')

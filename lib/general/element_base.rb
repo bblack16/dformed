@@ -116,12 +116,12 @@ module DFormed
 
       def setup_vars
         FormElement.load_registry
-        @events = Hash.new
-        @id = ''
-        @classes = Array.new
+        @events     = Hash.new
+        @id         = ''
+        @classes    = Array.new
         @attributes = Hash.new
-        @styles = Hash.new
-        @tagname = 'div'
+        @styles     = Hash.new
+        @tagname    = 'div'
       end
 
       def serialize_fields
@@ -130,12 +130,12 @@ module DFormed
         # Be sure to merge with super if this is reimplemented
         #     super.merge({})
         {
-          classes: { send: :classes, unless: [] },
-          id: { send: :id, unless: '' },
-          styles: { send: :styles, unless: {} },
+          classes:    { send: :classes, unless: [] },
+          id:         { send: :id, unless: '' },
+          styles:     { send: :styles, unless: {} },
           attributes: { send: :attributes, unless: {} },
-          events: { send: :events, unless: {} },
-          type: { send: :type }
+          events:     { send: :events, unless: {} },
+          type:       { send: :type }
         }
       end
 
@@ -176,7 +176,7 @@ module DFormed
         @events.each do |method, data|
           [data[:event]].flatten.each do |evt|
             [data[:selector]].flatten.each do |selector|
-              @element.on(evt, selector) do |event|
+              @element.on(*[evt, selector].reject(&:nil?)) do |event|
                 self.send(method)
               end
             end

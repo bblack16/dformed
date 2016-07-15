@@ -115,7 +115,6 @@ module DFormed
         @last_id = 0
         super
         @fields = Array.new
-        @element_type = 'div'
       end
 
       def custom_init *args

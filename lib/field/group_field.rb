@@ -6,7 +6,7 @@ module DFormed
     attr_reader :fields, :last_id, :labeled
 
     def labeled= lbl
-        @labeled = lbl.to_s != 'false'
+      @labeled = lbl.to_s != 'false'
     end
 
     def fields= fields
@@ -26,12 +26,18 @@ module DFormed
     def self.type
       [:group_field, :group]
     end
+    
+    def value
+      @fields.map{ |f| [f.name.to_sym, f.value] }.to_h
+    end
 
     def value= val
+      puts "value #{val}"
       val.each do |k, v|
         begin
           @fields.find{ |f| f.name.to_s == k.to_s }.value = v
         rescue
+          puts "ERROR"
         end
       end
     end

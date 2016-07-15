@@ -6,7 +6,6 @@ module DFormed
     attr_reader :connections
 
     def add_connection c
-      puts "ADDING #{c}"
       @connections = Hash.new unless @connections
       [c].flatten(1).each do |con|
         con = Connection.new(con) if con.is_a?(Hash)
