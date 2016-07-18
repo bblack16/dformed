@@ -58,6 +58,7 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
+        return @element if element?
         reset_ids
         div = Element['<div class="multi_container"/>']
         generate_fields
@@ -189,7 +190,7 @@ module DFormed
       
       def default_buttons
         {
-          add:    DFormed::Button.new(label: '<span class="glyphicon glyphicon-plus" style="color:green"/>'),
+          add:    DFormed::Button.new(label: '+'),
           remove: DFormed::Button.new(label: '-'),
           up:     DFormed::Button.new(label: '^'),
           down:   DFormed::Button.new(label: 'v')

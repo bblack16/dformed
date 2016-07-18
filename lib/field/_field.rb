@@ -51,7 +51,7 @@ module DFormed
           value:       { send: :value, unless: @default },
           default:     { send: :default, unless: nil },
           type:        { send: :type },
-          events:      { send: :events, unless: {refresh:{event: :change, selector: 'input, select, radio, checkbox, textarea'}, updated:{event: :change, selector: 'input, select, radio, checkbox, textarea'}}}
+          events:      { send: :events, unless: {refresh:{event: :change, selector: nil}, updated:{event: :change, selector: nil}}}
         )
       end
 

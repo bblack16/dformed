@@ -32,12 +32,10 @@ module DFormed
     end
 
     def value= val
-      puts "value #{val}"
       val.each do |k, v|
         begin
           @fields.find{ |f| f.name.to_s == k.to_s }.value = v
         rescue
-          puts "ERROR"
         end
       end
     end

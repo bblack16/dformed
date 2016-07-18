@@ -7,11 +7,11 @@ module DFormed
     @@registry = nil
 
     def self.registry
-      @@registry || Field.load_registry
+      @@registry || ElementBase.load_registry
     end
 
     def registry
-      @@registry || Field.load_registry
+      @@registry || ElementBase.load_registry
     end
 
     def type
@@ -69,9 +69,18 @@ module DFormed
 
     alias_method :style=, :styles=
 
-    def add_style k, v
-      @styles[k.to_s] = v.to_s
-      @element.css(k.to_s, v.to_s) if element?
+    def add_style key, value = nil
+      if key.is_a?(String) && value.nil?
+        styles = key.split(';').map{ |m| s = m.split(':'); [s[0].strip, s[1].strip]}.to_h
+      elsif key.is_a?(Hash)
+        styles = key 
+      else
+        styles = { key => value }
+      end
+      styles.each do |k, v|
+        @styles[k.to_s] = v.to_s
+        @element.css(k.to_s, v.to_s) if element?
+      end
     end
 
     def remove_style k
@@ -100,7 +109,11 @@ module DFormed
     def self.create hash, parent = nil
       raise TypeError, 'Could not locate the appropriate class to instantiate a field.' unless registry.include?(hash[:type].to_sym)
       hash[:parent] = parent
-      DFormed.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
+      Object.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
+    end
+    
+    def convert_to type
+      ElementBase.create(self.to_h.merge(type: type.to_sym))
     end
 
     protected
@@ -115,7 +128,7 @@ module DFormed
       end
 
       def setup_vars
-        FormElement.load_registry
+        FormElement.load_registry unless @@registry
         @events     = Hash.new
         @id         = ''
         @classes    = Array.new
@@ -184,19 +197,28 @@ module DFormed
         end
       end
 
-      def self.load_registry
-        return @@registry unless @@registry.nil?
-        @@registry = Hash.new
-        DFormed.constants.map do |c|
-          begin
-            [Object.const_get("DFormed::#{c}").type].flatten.each do |type|
-              @@registry[type] = c unless type == :abstract
+      def self.load_registry *namespaces
+        puts namespaces
+        @@registry = Hash.new unless @@registry
+        namespaces = [DFormed] if namespaces.empty?
+        namespaces.each do |np|
+          np.constants.map do |c|
+            begin
+              full = "#{np}::#{c}"
+              [Object.const_get(full).type].flatten.each do |type|
+                @@registry[type] = full unless type == :abstract
+              end
+            rescue
+              # Nothing, load failed
             end
-          rescue
-            # Nothing, load failed
           end
         end
         @@registry
+      end
+      
+      def self.reload_registry *namespaces
+        @@registry = Hash.new
+        load_registry(*namespaces)
       end
 
   end

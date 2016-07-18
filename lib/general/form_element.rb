@@ -11,6 +11,10 @@ module DFormed
     def name= name
       @name = name.to_s
     end
+    
+    def name? name
+      @name == name.to_s
+    end
 
     def description= t
       @description = t.to_s

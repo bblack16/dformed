@@ -25,6 +25,10 @@ module DFormed
       else
         raise ArgumentError, "The options argument must be a hash or array"
       end
+      if element?
+        retrieve_value
+        @element.replace_with(to_element)
+      end
     end
 
     def self.type

@@ -11,7 +11,9 @@ module DFormed
 
     def add *hashes
       hashes.each do |hash|
-        if hash[:type]
+        if hash.is_a?(ElementBase)
+          add_elem hash
+        elsif hash[:type]
           add_elem hash
         else # Supports a slightly different shorthand for convenience
           hash.each do |k, v|
@@ -20,15 +22,49 @@ module DFormed
         end
       end
     end
+    
+    def add_at hash, index
+      if hash.is_a?(ElementBase)
+        add_elem hash, index
+      elsif hash[:type]
+        add_elem hash, index
+      else # Supports a slightly different shorthand for convenience
+        hash.each do |k, v|
+          add_elem v.merge(type: k), index
+        end
+      end
+    end
 
     def remove *names
       names.map do |name|
-        @fields.delete_if{ |f| f.name.to_s == name.to_s }
+        @fields.delete_if{ |f| f.name.to_s == name.to_s rescue false }
       end.flatten
+    end
+    
+    def remove_at index
+      @fields.delete_at index
+    end
+    
+    def replace name, field
+      index = index_of(name)
+      @fields.delete_at(index)
+      add_at field, index
+    end
+    
+    def replace_at index, field
+      @fields.delete_at(index)
+      add_at field, index
+    end
+    
+    def index_of name
+      @fields.each_with_index do |f, x|
+        return x if (f.name.to_s == name.to_s) || name == f
+      end
+      nil
     end
 
     def value
-      @fields.map{ |f| f.respond_to?(:value) ? [f.name, f.value] : nil }
+      @fields.map{ |f| f.is_a?(FormElement) ? [f.name, f.value] : nil }
         .reject{ |r| r.nil? }.to_h
     end
 
@@ -93,10 +129,12 @@ module DFormed
 
     protected
     
-      def add_elem hash
-        elem = ElementBase.create(hash, self)
-        elem.name = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
-        @fields.push elem
+      def add_elem hash, index = @fields.size
+        index          = @fields.size if index > @fields.size
+        index          = 0 if index < 0
+        elem           = hash.is_a?(ElementBase) ? hash : ElementBase.create(hash, self)
+        elem.name      = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
+        @fields.insert index, elem
       end
 
       def next_id

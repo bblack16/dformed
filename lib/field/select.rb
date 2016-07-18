@@ -30,7 +30,7 @@ module DFormed
       def inner_html
         @options.map do |k,v|
           selected = [value].flatten.include?(v)
-          "<option value='#{k}'#{selected ? ' selected' : nil}>#{k}</option>"
+          "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
         end.join("\n")
       end
 
