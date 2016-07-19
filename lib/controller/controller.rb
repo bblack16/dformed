@@ -8,6 +8,7 @@ module DFormed
     end
 
     def add form, id
+      form = JSON.parse(form) if form.is_a?(String)
       form[:type] = :form unless form.include?(:type)
       @forms[id.to_s] = ElementBase.create(form, nil)
     end
@@ -27,6 +28,10 @@ module DFormed
     
     def has_form? id
       @forms.include?(id)
+    end
+    
+    def clone from, to
+      add(form(from).to_h, to)
     end
 
     def values id
@@ -51,10 +56,14 @@ module DFormed
         add form, id
         render id, selector
       end
+      
+      def clone_and_render from, to, selector
+        add_and_render(form(from).to_h, to, selector)
+      end
 
-      def download url, id, selector = false, retain = true
+      def download url, id, selector = false, retain = true, options: Hash.new
         retain = false if retain && !has_form?(id)
-        HTTP.get url do |response|
+        HTTP.get(url, options) do |response|
           `console.log(#{response})`
           values = values(id) if retain
           add response.json, id
