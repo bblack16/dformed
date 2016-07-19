@@ -28,7 +28,7 @@ module DFormed
 
       def setup_vars
         super
-        @size = 1
+        self.size = 1
         @title = ''
       end
 
