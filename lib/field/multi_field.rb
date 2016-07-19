@@ -58,7 +58,8 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        return @element if element?
+        @element.remove if element?
+        @fields.clear
         reset_ids
         div = Element['<div class="multi_container"/>']
         generate_fields
