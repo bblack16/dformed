@@ -78,10 +78,6 @@ module DFormed
         elem.append(form(id).to_element)
       end
 
-      def delete id
-        form(id).delete
-      end
-
       def send id, url
         HTTP.post url, form(id) do |response|
           `console.log(response.json)`
