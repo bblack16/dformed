@@ -89,6 +89,10 @@ module DFormed
     def vget name
       get(name).value
     end
+    
+    def has_field? name
+      @fields.any?{ |a| a.name == name.to_s rescue false }
+    end
 
     def clear
       @fields.each{ |f| f.clear if f.respond_to?(:clear) }
