@@ -4,7 +4,7 @@ module DFormed
     attr_reader :active, :checks, :invalid_message, :classes, :styles
 
     def active= a
-      @active = a == true
+      @active = a == true || a = 'true'
     end
 
     def checks= exp
@@ -12,13 +12,13 @@ module DFormed
     end
 
     def add_check hash
-      hash = { expression: hash } if !hash.is_a?(Hash)
+      hash = { expression: hash } unless hash.is_a?(Hash)
       @checks.push(
         {
           expression: deserialize_expressions([hash[:expression]].flatten(1)),
-          type: hash[:type] || :any,
-          inverse: hash[:inverse] || false,
-          message: hash[:message] || 'invalid entry'
+          type:       hash[:type]    || :any,
+          inverse:    hash[:inverse] || false,
+          message:    hash[:message] || 'invalid entry'
         }
       )
     end
