@@ -40,8 +40,7 @@ module DFormed
         super.merge(
           {
             title: { send: :title },
-            size: { send: :size, unless: 1 },
-            connections: { send: :serialize_connections, unless: [] }
+            size: { send: :size, unless: 1 }
           }
         )
       end

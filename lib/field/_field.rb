@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Field < FormElement
+  class Field < ElementBase
     include Connectable, Valuable, Validateable
 
     def self.type

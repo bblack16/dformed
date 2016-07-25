@@ -2,7 +2,7 @@
 
 module DFormed 
   
-  class Button < FormElement
+  class Button < ElementBase
     include Connectable
     attr_reader :label
     

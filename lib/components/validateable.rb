@@ -1,6 +1,6 @@
 require_relative 'validator'
 
-# This module provides methods to implement validators with a FormElement
+# This module provides methods to implement validators with a ElementBase
 # Anything that uses this must either also include the Valuable module or
 # implement a value attr itself
 module DFormed

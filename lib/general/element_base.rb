@@ -2,9 +2,21 @@
 module DFormed
 
   class ElementBase < Base
-    attr_reader :classes, :attributes, :styles, :tagname, :element, :id, :events
+    attr_reader :classes, :attributes, :styles, :tagname, :element, :id, :events, :parent, :name
 
     @@registry = nil
+    
+    def parent= par
+      @parent = par
+    end
+
+    def name= name
+      @name = name.to_s
+    end
+    
+    def name? name
+      @name == name.to_s
+    end
 
     def self.registry
       @@registry || ElementBase.load_registry
@@ -128,7 +140,9 @@ module DFormed
       end
 
       def setup_vars
-        FormElement.load_registry unless @@registry
+        ElementBase.load_registry unless @@registry
+        @name       = nil
+        @parent     = nil
         @events     = Hash.new
         @id         = ''
         @classes    = Array.new
@@ -143,6 +157,7 @@ module DFormed
         # Be sure to merge with super if this is reimplemented
         #     super.merge({})
         {
+          name:       { send: :name },
           classes:    { send: :classes, unless: [] },
           id:         { send: :id, unless: '' },
           styles:     { send: :styles, unless: {} },
@@ -198,7 +213,6 @@ module DFormed
       end
 
       def self.load_registry *namespaces
-        puts namespaces
         @@registry = Hash.new unless @@registry
         namespaces = [DFormed] if namespaces.empty?
         namespaces.each do |np|

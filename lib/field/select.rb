@@ -10,6 +10,15 @@ module DFormed
     def type
       :select
     end
+    
+    def value= val
+      @value = val.to_s
+      if element?
+        @element.children('option').each do |opt|
+          opt.attr('selected', opt.attr('value') == val)
+        end
+      end
+    end
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
@@ -25,11 +34,12 @@ module DFormed
       def setup_vars
         super
         @tagname = 'select'
+        @type = :select
       end
 
       def inner_html
         @options.map do |k,v|
-          selected = [value].flatten.include?(v)
+          selected = [@value].flatten.include?(v.to_s)
           "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
         end.join("\n")
       end

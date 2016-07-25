@@ -1,7 +1,7 @@
 
 module DFormed
 
-  class Form < FormElement
+  class Form < ElementBase
     include Valuable
     attr_reader :fields, :last_id
 
@@ -64,7 +64,7 @@ module DFormed
     end
 
     def value
-      @fields.map{ |f| f.is_a?(FormElement) ? [f.name, f.value] : nil }
+      @fields.map{ |f| f.is_a?(ElementBase) && f.respond_to?(:value) ? [f.name, f.value] : nil }
         .reject{ |r| r.nil? }.to_h
     end
 
@@ -72,6 +72,8 @@ module DFormed
       @values = {}
       set values
     end
+    
+    alias_method :values=, :value=
 
     def set hash
       hash.each do |k, v|
@@ -88,10 +90,6 @@ module DFormed
     
     def vget name
       get(name).value
-    end
-    
-    def has_field? name
-      @fields.any?{ |a| a.name == name.to_s rescue false }
     end
 
     def clear
@@ -172,7 +170,7 @@ module DFormed
         super.merge(
           {
             fields: { send: :fields_to_h },
-            type: { send: :type }
+            type:   { send: :type }
           }
         )
       end

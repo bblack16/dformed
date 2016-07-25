@@ -1,7 +1,7 @@
 
 # This module is used for Elements that should contain a value
 # The methods added provide means of interacting with values from
-# a generic FormElement and can be overwritten in subclasses if needed
+# a generic ElementBase and can be overwritten in subclasses if needed
 module DFormed
 
   module Valuable

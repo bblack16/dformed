@@ -19,9 +19,9 @@ module DFormed
 
     def options= options
       if options.is_a?(Array)
-        @options = options.map{ |o| [o,o] }.to_h
+        @options = options.map{ |o| [o.to_s,o.to_s] }.to_h
       elsif options.is_a?(Hash)
-        @options = options
+        @options = options.map{ |k, v| [k.to_s, v.to_s] }.to_h
       else
         raise ArgumentError, "The options argument must be a hash or array"
       end

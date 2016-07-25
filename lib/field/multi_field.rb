@@ -16,8 +16,7 @@ module DFormed
 
     def value= v
       @value = [v].flatten(1)
-      # generate_fields
-      # @value
+      to_element if element?
     end
 
     def min= n
@@ -58,19 +57,18 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        @element.remove if element?
+        @element.empty if element?
         @fields.clear
         reset_ids
-        div = Element['<div class="multi_container"/>']
+        @element = Element['<div class="multi_container"/>'] unless element?
         generate_fields
         @fields.each do |ef|
           id = next_id
           ef.add_attribute('mgf_sort', id)
           row = Element["<div class='multi_field' mgf_sort='#{id}'/>"]
           row.append(ef.to_element)
-          div.append(row)
+          @element.append(row)
         end
-        @element = div
         refresh_buttons
         @element
       end
@@ -95,10 +93,10 @@ module DFormed
       end
       
       def clone event
-        id = next_id
-        elm = event.element.closest('div[mgf_sort]')
-        sort = elm.attr(:mgf_sort).to_i
-        f = @fields.find{ |fl| fl.attributes[:mgf_sort].to_i == sort }
+        id    = next_id
+        elm   = event.element.closest('div[mgf_sort]')
+        sort  = elm.attr(:mgf_sort).to_i
+        f     = @fields.find{ |fl| fl.attributes[:mgf_sort].to_i == sort }
         new_f = generate_field f.value
         new_f.add_attribute(:mgf_sort, id)
         row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
