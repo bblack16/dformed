@@ -101,8 +101,19 @@ module DFormed
     end
 
     def register_event hash
+      unless hash.include?(:method)
+        hash = { method: hash.keys.first }.merge(hash.values.first)
+      end
       @events[hash[:method]] = { event: hash[:event], selector: hash[:selector] }
       register_events
+    end
+    
+    def events= events
+      if events.is_a?(Array)
+        events.each{ |e| register_event e }
+      else
+        events.each{ |m, e| register_event({method: m}.merge(e)) }
+      end
     end
 
     def to_html
