@@ -13,13 +13,18 @@ module DFormed
     end
 
     def value= val
-      @value = val
-      @element.find('radio, checkbox').prop('checked', false) if element?
+      if @type == :checkbox
+        @value = [val].flatten.map{ |v| v.to_s }
+      else
+        @value = val.to_s
+      end
+      @element.html(to_html) if element?
+      # @element.find('radio, checkbox').prop('checked', false) if element?
     end
 
     def options= options
       if options.is_a?(Array)
-        @options = options.map{ |o| [o.to_s,o.to_s] }.to_h
+        @options = options.map{ |o| [o.to_s, o.to_s] }.to_h
       elsif options.is_a?(Hash)
         @options = options.map{ |k, v| [k.to_s, v.to_s] }.to_h
       else
@@ -27,7 +32,7 @@ module DFormed
       end
       if element?
         retrieve_value
-        @element.replace_with(to_element)
+        @element.html(to_html)
       end
     end
 
