@@ -11,7 +11,7 @@ module DFormed
     end
 
     def template= t
-      @template = t.is_?(ElementBase) ? t : ElementBase.create(t, @parent)
+      @template = t.is_a?(ElementBase) ? t : ElementBase.create(t, @parent)
     end
 
     def value= v
@@ -70,6 +70,7 @@ module DFormed
           @element.append(row)
         end
         refresh_buttons
+        register_events
         @element
       end
       
@@ -239,8 +240,13 @@ module DFormed
           moveable:     { send: :moveable },
           cloneable:    { send: :cloneable },
           hide_buttons: { send: :hide_buttons, unless: false },
-          value:        { send: :values, unless: [nil] }
+          value:        { send: :values, unless: [nil] },
+          template:     { send: :serialize_template, unless: {} }
         )
+      end
+      
+      def serialize_template
+        @template.to_h
       end
       
       def serialize_buttons btns = @buttons
