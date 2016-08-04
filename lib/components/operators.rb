@@ -5,7 +5,7 @@ module DFormed
     module Operators
 
       def self.is val, exp
-        val == exp
+        val.to_s == exp.to_s
       end
 
       singleton_class.send(:alias_method, :equal, :is)
