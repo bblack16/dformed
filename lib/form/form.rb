@@ -115,6 +115,7 @@ module DFormed
           row.append(field.to_element)
           @element.append(row)
         end
+        @fields.each{ |f| field_changed f }
         @element
       end
 
