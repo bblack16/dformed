@@ -17,7 +17,7 @@ module DFormed
 
     # alias_method :label=, :name=
     alias_method :value=, :label=
-    # alias_method :value, :label
+    alias_method :value, :label
     
     protected
 
