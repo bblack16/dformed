@@ -32,11 +32,14 @@ module DFormed
     end
 
     def value= val
-      val.each do |k, v|
-        begin
-          @fields.find{ |f| f.name.to_s == k.to_s }.value = v
-        rescue
+      begin
+        val.each do |k, v|
+          begin
+            @fields.find{ |f| f.name.to_s == k.to_s }.value = v
+          rescue
+          end
         end
+      rescue
       end
     end
 
@@ -44,7 +47,21 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        @element = super.append(@fields.map{ |f| f.to_element })
+        if @labeled
+          body = Element[
+            '<table><thead><tr>' +
+            @fields.map{ |f| "<th>#{f.name.to_s.gsub('_', ' ').title_case}</th>"}.join +
+            '</tr></thead><tbody><tr id="fields"/></tbody></table>'
+          ]
+          @fields.each do |f|
+            td = Element['<td>']
+            td.append(f.to_element)
+            body.find('#fields').append(td)
+          end
+          @element = body
+        else
+          @element = super.append(@fields.map{ |f| f.to_element })
+        end
       end
 
       def retrieve_value
@@ -73,13 +90,14 @@ module DFormed
         @last_id = 0
         super
         @fields = Array.new
+        @labeled = true
       end
 
       def serialize_fields
         super.merge(
           {
             fields: { send: :fields_to_h, unless: [] },
-            labeled: { send: :labeled, unless: true }
+            labeled: { send: :labeled }
           }
         )
       end
