@@ -32,7 +32,7 @@ module DFormed
     end
 
     def values
-      [@value].flatten(1)
+      [@value == [nil] ? @default : @value].flatten(1)
     end
     
     def size
@@ -62,7 +62,8 @@ module DFormed
         reset_ids
         @element = Element['<div class="multi_container"/>'] unless element?
         generate_fields
-        @fields.each do |ef|
+        @fields.each_with_index do |ef, i|
+          ef.labeled = false if i > 0 && ef.is_a?(GroupField)
           id = next_id
           ef.add_attribute('mgf_sort', id)
           row = Element["<div class='multi_field' mgf_sort='#{id}'/>"]
@@ -177,6 +178,7 @@ module DFormed
       def setup_vars
         reset_ids
         super
+        @default      = [nil]
         @min          = 1
         @max          = 1
         @per_col      = 1
