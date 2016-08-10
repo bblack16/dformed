@@ -99,6 +99,10 @@ module DFormed
     def field_changed field
       @fields.each{ |f| f.check_connections(field) if f.respond_to?(:check_connections) }
     end
+    
+    def change_all_fields
+      @fields.each{ |f| field_changed f }
+    end
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
@@ -115,7 +119,7 @@ module DFormed
           row.append(field.to_element)
           @element.append(row)
         end
-        @fields.each{ |f| field_changed f }
+        change_all_fields
         @element
       end
 
