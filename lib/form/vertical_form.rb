@@ -35,7 +35,7 @@ module DFormed
           end
           @element.append(row)
         end
-        @fields.each{ |f| field_changed f }
+        change_all_fields
         @element
       end
 
