@@ -100,8 +100,8 @@ module DFormed
         sort  = elm.attr(:mgf_sort).to_i
         f     = @fields.find{ |fl| fl.attributes[:mgf_sort].to_i == sort }
         new_f = generate_field f.value
+        row   = Element["<div class='multi_field' mgf_sort=#{id}/>"]
         new_f.add_attribute(:mgf_sort, id)
-        row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
         row.append new_f.to_element
         elm.after(row)
         @fields.push new_f
@@ -209,7 +209,7 @@ module DFormed
       
       def generate_fields
         values.each do |h|
-          @fields.push generate_field h
+          @fields.push generate_field(h)
         end
         @fields.push generate_field while @fields.size < @min
       end
