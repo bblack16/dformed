@@ -4,15 +4,23 @@ module DFormed
 
     def initialize *args
       setup_vars
+      value = nil
       unless args.nil?
         args.each do |arg|
           if arg.is_a?(Hash)
             arg.each do |k,v|
+              if k.to_s == 'value'
+                value = v
+                next 
+              end
               self.send("#{k}=".to_sym, v) if self.respond_to?("#{k}=".to_sym)
             end
           end
         end
         custom_init *args
+      end
+      if value && respond_to?(:value=)
+        self.value = value 
       end
     end
 
