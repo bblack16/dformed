@@ -22,11 +22,9 @@ module DFormed
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
-
       def retrieve_value
         self.value = @element.value
       end
-
     end
 
     protected
