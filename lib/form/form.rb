@@ -22,7 +22,7 @@ module DFormed
         end
       end
     end
-    
+
     def add_at hash, index
       if hash.is_a?(ElementBase)
         add_elem hash, index
@@ -40,22 +40,22 @@ module DFormed
         @fields.delete_if{ |f| f.name.to_s == name.to_s rescue false }
       end.flatten
     end
-    
+
     def remove_at index
       @fields.delete_at index
     end
-    
+
     def replace name, field
       index = index_of(name)
       @fields.delete_at(index)
       add_at field, index
     end
-    
+
     def replace_at index, field
       @fields.delete_at(index)
       add_at field, index
     end
-    
+
     def index_of name
       @fields.each_with_index do |f, x|
         return x if (f.name.to_s == name.to_s) || name == f
@@ -72,7 +72,7 @@ module DFormed
       @values = {}
       set values
     end
-    
+
     alias_method :values=, :value=
 
     def set hash
@@ -83,11 +83,11 @@ module DFormed
         end
       end
     end
-    
+
     def get name
       @fields.find{ |f| f.name.to_s == name.to_s }
     end
-    
+
     def vget name
       get(name).value
     end
@@ -99,7 +99,7 @@ module DFormed
     def field_changed field
       @fields.each{ |f| f.check_connections(field) if f.respond_to?(:check_connections) }
     end
-    
+
     def change_all_fields
       @fields.each{ |f| field_changed f }
     end
@@ -135,7 +135,7 @@ module DFormed
     end
 
     protected
-    
+
       def add_elem hash, index = @fields.size
         index          = @fields.size if index > @fields.size
         index          = 0 if index < 0

@@ -17,12 +17,12 @@ module DFormed
 
     def value= v
       super
-      @attributes[:value] = value
+      @attributes[:value] = self.value
     end
 
     def default= d
       super
-      @attributes[:value] = value
+      @attributes[:value] = self.value
     end
 
     def self.type

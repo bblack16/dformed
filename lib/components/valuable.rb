@@ -10,8 +10,8 @@ module DFormed
     @default = nil
 
     def value= val
+      @element.value = val if element? && @value != val
       @value = val
-      @element.value = val if element?
     end
 
     def default= d
@@ -34,7 +34,7 @@ module DFormed
 
       def retrieve_value
         return nil unless @element
-        self.value = @element.value
+        @value = @element.value
       end
 
     end
