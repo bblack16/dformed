@@ -25,11 +25,11 @@ module DFormed
       form(id).delete if DFormed.in_opal?
       remove id
     end
-    
+
     def has_form? id
       @forms.include?(id)
     end
-    
+
     def clone from, to
       add(form(from).to_h, to)
     end
@@ -41,7 +41,7 @@ module DFormed
         form(id).value
       end
     end
-    
+
     def set id, values
       form(id).value = values
     end
@@ -56,7 +56,7 @@ module DFormed
         add form, id
         render id, selector
       end
-      
+
       def clone_and_render from, to, selector
         add_and_render(form(from).to_h, to, selector)
       end
@@ -75,7 +75,8 @@ module DFormed
       def render id, selector
         elem = Element[selector].first
         elem.empty
-        elem.append(form(id).to_element)
+        fe = form(id).element || form(id).to_element
+        elem.append(fe)
       end
 
       def send id, url
