@@ -76,6 +76,7 @@ module DFormed
         elem = Element[selector].first
         elem.empty
         fe = form(id).element || form(id).to_element
+        form(id).reregister_field_events
         elem.append(fe)
       end
 

@@ -128,6 +128,10 @@ module DFormed
           .reject{ |r| r.nil? }.to_h
       end
 
+      def reregister_field_events
+        @fields.each{ |f| f.reregister_events rescue nil }
+      end
+
     end
 
     def self.type

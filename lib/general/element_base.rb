@@ -5,7 +5,7 @@ module DFormed
     attr_reader :classes, :attributes, :styles, :tagname, :element, :id, :events, :parent, :name
 
     @@registry = nil
-    
+
     def parent= par
       @parent = par
     end
@@ -13,7 +13,7 @@ module DFormed
     def name= name
       @name = name.to_s
     end
-    
+
     def name? name
       @name == name.to_s
     end
@@ -85,7 +85,7 @@ module DFormed
       if key.is_a?(String) && value.nil?
         styles = key.split(';').map{ |m| s = m.split(':'); [s[0].strip, s[1].strip]}.to_h
       elsif key.is_a?(Hash)
-        styles = key 
+        styles = key
       else
         styles = { key => value }
       end
@@ -107,7 +107,7 @@ module DFormed
       @events[hash[:method]] = { event: hash[:event], selector: hash[:selector] }
       register_events
     end
-    
+
     def events= events
       if events.is_a?(Array)
         events.each{ |e| register_event e }
@@ -127,6 +127,10 @@ module DFormed
         @element = Element[to_html]
       end
 
+      def reregister_events
+        register_events
+      end
+
     end
 
     def self.create hash, parent = nil
@@ -134,7 +138,7 @@ module DFormed
       hash[:parent] = parent
       Object.const_get("#{@@registry[hash[:type].to_sym]}").new(hash)
     end
-    
+
     def convert_to type
       ElementBase.create(self.to_h.merge(type: type.to_sym))
     end
@@ -240,7 +244,7 @@ module DFormed
         end
         @@registry
       end
-      
+
       def self.reload_registry *namespaces
         @@registry = Hash.new
         load_registry(*namespaces)
