@@ -6,11 +6,11 @@ module DFormed
     def self.type
       :select
     end
-    
+
     def type
       :select
     end
-    
+
     def value= val
       @value = val.to_s
       if element?
@@ -29,7 +29,7 @@ module DFormed
 
     protected
 
-      def setup_vars
+      def lazy_setup
         super
         @tagname = 'select'
         @type = :select

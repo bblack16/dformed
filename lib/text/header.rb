@@ -2,20 +2,13 @@
 module DFormed
 
   class Header < Separator
-    include Connectable
-    attr_reader :title, :size
+    after :refresh_tagname, :size=
+    
+    attr_str :title, serialize: true
+    attr_int_between 1, 4, :size, default: 1, serialize: true
 
     def self.type
       :header
-    end
-
-    def size= num
-      @size = num.to_i if (1..4) === num.to_i
-      @tagname = "h#{@size}"
-    end
-
-    def title= title
-      @title = title.to_s
     end
 
     alias_method :value=, :title=
@@ -26,23 +19,12 @@ module DFormed
         @title
       end
 
-      def setup_vars
-        super
-        self.size = 1
-        @title = ''
+      def refresh_tagname
+        @tagname = "h#{@size}"
       end
 
-      def custom_init *args
+      def lazy_init *args
         self.title = args.first if args.first.is_a?(String)
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            title: { send: :title },
-            size: { send: :size, unless: 1 }
-          }
-        )
       end
 
   end

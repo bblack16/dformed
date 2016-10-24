@@ -6,23 +6,14 @@ module DFormed
     def self.type
       [:multi_select, :multiselect]
     end
-    
+
     def type
       :multi_select
     end
 
-    # # These methods are only available if the engine is Opal
-    # if DFormed.in_opal?
-    # 
-    #   def retrieve_value
-    #     self.value = @element.value
-    #   end
-    # 
-    # end
-
     protected
 
-      def setup_vars
+      def lazy_setup
         super
         add_attribute :multiple, true
       end

@@ -1,6 +1,6 @@
 module DFormed
 
-  class Validator < Base
+  class Validator < BBLib::LazyClass
     attr_reader :active, :checks, :invalid_message, :classes, :styles
 
     def active= a

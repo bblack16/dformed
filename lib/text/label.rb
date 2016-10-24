@@ -2,8 +2,7 @@
 module DFormed
 
   class Label < ElementBase
-    include Connectable
-    attr_reader :label
+    attr_str :label, serialize: true
 
     def label= lbl
       @label = lbl.to_s
@@ -15,33 +14,22 @@ module DFormed
       :label
     end
 
-    # alias_method :label=, :name=
     alias_method :value=, :label=
     alias_method :value, :label
-    
+
     protected
 
       def inner_html
         @label
       end
 
-      def setup_vars
+      def lazy_setup
         super
-        @connections = Array.new
         @tagname     = 'label'
       end
 
-      def custom_init *args
+      def lazy_init *args
         self.label = args.first if args.first.is_a?(String)
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            type:  { send: :type },
-            label: { send: :label, unless: '' }
-          }
-        )
       end
 
   end

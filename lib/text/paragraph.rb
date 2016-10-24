@@ -2,8 +2,7 @@
 module DFormed
 
   class Paragraph < Separator
-    include Connectable
-    attr_reader :body
+    attr_str :body, serialize: true
 
     def self.type
       [:paragraph, :p]
@@ -21,23 +20,13 @@ module DFormed
         @body
       end
 
-      def setup_vars
+      def lazy_setup
         super
         @tagname = 'p'
-        @body = ''
       end
 
-      def custom_init *args
+      def lazy_init *args
         self.body = args.first if args.first.is_a?(String)
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            body: { send: :body },
-            connections: { send: :serialize_connections, unless: [] }
-          }
-        )
       end
 
   end

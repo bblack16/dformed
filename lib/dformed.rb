@@ -1,3 +1,4 @@
+require 'bblib' unless defined?(BBLib::VERSION)
 
 module DFormed
   def self.in_opal?
@@ -15,11 +16,9 @@ unless RUBY_ENGINE == 'opal'
 end
 
 require_relative 'dformed/version'
-require_relative 'opal/opal'
-require_relative 'general/general'
-require_relative 'general/base'
-require_relative 'general/element_base'
 require_relative 'components/_components'
+require_relative 'general/element_base'
+require_relative 'general/value_element'
 require_relative 'text/_requires'
 require_relative 'button/button'
 require_relative 'form/_form'

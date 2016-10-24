@@ -1,8 +1,7 @@
 
 module DFormed
 
-  class Field < ElementBase
-    include Connectable, Valuable, Validateable
+  class Field < ValueElement
 
     def self.type
       :abstract
@@ -30,30 +29,29 @@ module DFormed
 
     protected
 
+      DEFAULT_EVENTS = [{ refresh:{event: :change, selector: nil}, updated: {event: :change, selector: nil} }]
+
       def inner_html
         super
       end
 
-      def setup_vars
+      def lazy_setup
         super
-        @connections = Array.new
-        @validator = Validator.new
-        @value = nil
-        @default = nil
         register_event method: :refresh, event: :change, selector: nil
         register_event method: :updated, event: :change, selector: nil
+        serialize_method :events, ignore: DEFAULT_EVENTS
       end
 
-      def serialize_fields
-        super.merge(
-          connections: { send: :serialize_connections, unless: [] },
-          validator:   { send: :serialize_validator, unless: {} },
-          value:       { send: :value, unless: @default },
-          default:     { send: :default, unless: nil },
-          type:        { send: :type },
-          events:      { send: :events, unless: {refresh:{event: :change, selector: nil}, updated:{event: :change, selector: nil}}}
-        )
-      end
+      # def serialize_fields
+      #   super.merge(
+      #     connections: { send: :serialize_connections, unless: [] },
+      #     validator:   { send: :serialize_validator, unless: {} },
+      #     value:       { send: :value, unless: @default },
+      #     default:     { send: :default, unless: nil },
+      #     type:        { send: :type },
+      #     events:      { send: :events, unless: }
+      #   )
+      # end
 
   end
 

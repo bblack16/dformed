@@ -1,17 +1,28 @@
 
 module DFormed
 
-  class ElementBase < Base
-    attr_reader :classes, :attributes, :styles, :tagname, :element, :id, :events, :parent, :name
+  class ElementBase < BBLib::LazyClass
+    attr_array_of String, :classes, default: [], serialize: true
+    attr_hash :attributes, :styles, :events, default: Hash.new, serialize: true
+    attr_str :tagname, default: 'div'
+    attr_str :id, :name, allow_nil: true, default: nil, serialize: true
+    attr_of Object, :parent, allow_nil: true, default: nil
+    attr_array_of Connection, :connections, add_rem: true, default: Array.new, serialize: true
+    attr_reader :element
+
+    self.serialize_method :type, always: true
+
+    alias_method :to_h, :serialize
+    alias_method :add_connection, :add_connections
 
     @@registry = nil
 
-    def parent= par
-      @parent = par
-    end
-
-    def name= name
-      @name = name.to_s
+    def self.new *args
+      if BBLib::named_args(*args).include?(:type) && self == ElementBase
+        self.create(*args)
+      else
+        super
+      end
     end
 
     def name? name
@@ -27,19 +38,7 @@ module DFormed
     end
 
     def type
-      begin
-        [DFormed.const_get(self.class.to_s).type].flatten.first
-      rescue
-        :abstract
-      end
-    end
-
-    def id= id
-      @id = id.to_s.strip.gsub(' ', '_')
-    end
-
-    def classes= klasses
-      @classes = [klasses].flatten.map{ |m| m.to_s }
+      [DFormed.const_get(self.class.to_s).type].flatten.first rescue :abstract
     end
 
     alias_method :class=, :classes=
@@ -73,7 +72,7 @@ module DFormed
 
     def styles= a
       @styles = Hash.new
-      a = a.split(';').map{ |m| s = m.split(':'); [s[0].strip, s[1].strip]}.to_h if a.is_a?(String)
+      a = a.split(';').map{ |m| s = m.split(':', 2) }.to_h if a.is_a?(String)
       a.each do |k,v|
         add_style k, v
       end
@@ -109,10 +108,19 @@ module DFormed
     end
 
     def events= events
+      return nil unless events
+      @events = Hash.new unless @events
       if events.is_a?(Array)
         events.each{ |e| register_event e }
       else
         events.each{ |m, e| register_event({method: m}.merge(e)) }
+      end
+    end
+
+    def check_connections elem
+      return unless @connections
+      @connections.each do |connection|
+        connection.compare(self, elem)
       end
     end
 
@@ -140,11 +148,14 @@ module DFormed
     end
 
     def convert_to type
-      ElementBase.create(self.to_h.merge(type: type.to_sym))
+      ElementBase.create(self.serialize.merge(type: type.to_sym))
     end
 
     protected
 
+    def lazy_setup
+      ElementBase.load_registry unless @@registry
+    end
 
 ###############################################
 # REDEFINE
@@ -154,37 +165,6 @@ module DFormed
         # This sets up the inner html for the to_html call
       end
 
-      def setup_vars
-        ElementBase.load_registry unless @@registry
-        @name       = nil
-        @parent     = nil
-        @events     = Hash.new
-        @id         = ''
-        @classes    = Array.new
-        @attributes = Hash.new
-        @styles     = Hash.new
-        @tagname    = 'div'
-      end
-
-      def serialize_fields
-        # Make this return a hash of fields you want serialized
-        # Format is {serialized_name => {send: :method_to_call, unless: nil}}
-        # Be sure to merge with super if this is reimplemented
-        #     super.merge({})
-        {
-          name:       { send: :name },
-          classes:    { send: :classes, unless: [] },
-          id:         { send: :id, unless: '' },
-          styles:     { send: :styles, unless: {} },
-          attributes: { send: :attributes, unless: {} },
-          events:     { send: :events, unless: {} },
-          type:       { send: :type }
-        }
-      end
-
-      def custom_init *args
-        # Defined custom initialization here...
-      end
 #
 # END OF REDEFINE
 ##############################################
@@ -219,7 +199,7 @@ module DFormed
         @events.each do |method, data|
           [data[:event]].flatten.each do |evt|
             [data[:selector]].flatten.each do |selector|
-              @element.on(*[evt, selector].reject(&:nil?)) do |event|
+              @element.on(*[evt, selector].compact) do |event|
                 self.send(method)
               end
             end
@@ -230,12 +210,11 @@ module DFormed
       def self.load_registry *namespaces
         @@registry = Hash.new unless @@registry
         namespaces = [DFormed] if namespaces.empty?
-        namespaces.each do |np|
-          np.constants.map do |c|
+        namespaces.each do |namespace|
+          namespace.constants.map do |constant|
             begin
-              full = "#{np}::#{c}"
-              [Object.const_get(full).type].flatten.each do |type|
-                @@registry[type] = full unless type == :abstract
+              [namespace.const_get(constant.to_s).type].flatten.each do |type|
+                @@registry[type] = "#{namespace}::#{constant}" unless type == :abstract
               end
             rescue
               # Nothing, load failed

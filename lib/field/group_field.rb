@@ -3,11 +3,9 @@ module DFormed
   # A field that has multiple inputs
   # Such as key value pair type fields
   class GroupField < Field
-    attr_reader :fields, :last_id, :labeled
-
-    def labeled= lbl
-      @labeled = lbl.to_s != 'false'
-    end
+    attr_ary_of ElementBase, :fields, default: [], serialize: true
+    attr_int :last_id, default: 0
+    attr_bool :labeled, default: true, serialize: true
 
     def fields= fields
       @fields = Array.new
@@ -26,7 +24,7 @@ module DFormed
     def self.type
       [:group_field, :group]
     end
-    
+
     def value
       @fields.map{ |f| [f.name.to_sym, f.value] }.to_h
     end
@@ -84,26 +82,6 @@ module DFormed
         @fields.map do |f|
           f.to_html
         end.join
-      end
-
-      def setup_vars
-        @last_id = 0
-        super
-        @fields = Array.new
-        @labeled = true
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            fields: { send: :fields_to_h, unless: [] },
-            labeled: { send: :labeled }
-          }
-        )
-      end
-
-      def fields_to_h
-        @fields.map{ |f| f.to_h rescue nil }
       end
 
   end

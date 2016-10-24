@@ -3,8 +3,11 @@ module DFormed
   # A field that can be cloned and chopped.
   # Basically, a field that can have multiple instances of itself
   class MultiField < Field
-    attr_reader :min, :max, :per_col, :template, :fields, :last
-    attr_accessor :buttons, :moveable, :cloneable, :hide_buttons
+    attr_int_between 1, nil, :min, :max, :per_col, default: 1, serialize: true
+    attr_of ElementBase, :template, serialize: true
+    attr_bool :cloneable, :moveable, default: true, serialize: true
+    attr_bool :hide_buttons, default: false, serialize: true
+    attr_array_of Button, :buttons, serialize: true
 
     def self.type
       [:multi_field, :mf, :multi]
@@ -19,26 +22,14 @@ module DFormed
       to_element if element?
     end
 
-    def min= n
-      @min = n.to_i
-    end
-
-    def max= n
-      @max = n.to_i
-    end
-
-    def per_col= pc
-      @per_col = pc.to_i <= 1 ? 1 : pc.to_i
-    end
-
     def values
       [@value == [nil] ? @default : @value].flatten(1)
     end
-    
+
     def size
       @fields.size
     end
-    
+
     def add_value v = nil
       @value << v
     end
@@ -74,7 +65,7 @@ module DFormed
         register_events
         @element
       end
-      
+
       def refresh_buttons
         retrieve_value
         @element.find('.multi_field').each_with_index do |elem, indx|
@@ -88,12 +79,12 @@ module DFormed
           elem.append(buttons)
         end
       end
-      
+
       def retrieve_value
         return [] unless @element
         @value = @fields.map{ |ef| ef.retrieve_value }
       end
-      
+
       def clone event
         id    = next_id
         elm   = event.element.closest('div[mgf_sort]')
@@ -175,21 +166,15 @@ module DFormed
 
     protected
 
-      def setup_vars
+      def lazy_setup
         reset_ids
         super
         @default      = [nil]
-        @min          = 1
-        @max          = 1
-        @per_col      = 1
-        @cloneable    = true
-        @moveable     = true
         @value        = [nil]
-        @hide_buttons = false
-        @fields       = Array.new
         @buttons      = default_buttons
+        serialize_method :buttons, ignore: default_buttons.map{ |b| b.serialize }
       end
-      
+
       def default_buttons
         {
           add:    DFormed::Button.new(label: '+'),
@@ -198,26 +183,26 @@ module DFormed
           down:   DFormed::Button.new(label: 'v')
         }
       end
-      
+
       def next_id
         @last_id += 1
       end
-      
+
       def reset_ids
         @last_id = 0
       end
-      
+
       def generate_fields
         values.each do |h|
           @fields.push generate_field(h)
         end
         @fields.push generate_field while @fields.size < @min
       end
-      
+
       def generate_field val = nil
         ElementBase.create(@template.to_h.merge(value: val), @parent)
       end
-      
+
       def make_buttons
         if DFormed.in_opal?
           ''
@@ -230,35 +215,6 @@ module DFormed
       def make_button klass, html, disabled = false
         dis = disabled ? ' disabled' : nil
         "<button class='multi_button #{klass}#{dis}'#{dis}>#{html}</button>"
-      end
-
-      def serialize_fields
-        super.merge(
-          min:          { send: :min, unless: 1 },
-          max:          { send: :max, unless: 1 },
-          per_col:      { send: :per_col, unless: 1 },
-          buttons:      { send: :serialize_buttons, unless: serialize_default_buttons },
-          type:         { send: :type },
-          moveable:     { send: :moveable },
-          cloneable:    { send: :cloneable },
-          hide_buttons: { send: :hide_buttons, unless: false },
-          value:        { send: :values, unless: [nil] },
-          template:     { send: :serialize_template, unless: {} }
-        )
-      end
-      
-      def serialize_template
-        @template.to_h
-      end
-      
-      def serialize_buttons btns = @buttons
-        @buttons.map do |name, btn|
-          [name, btn.to_h]
-        end.to_h
-      end
-      
-      def serialize_default_buttons
-        serialize_buttons default_buttons
       end
 
   end

@@ -25,24 +25,12 @@ module DFormed
 
     protected
 
-      def setup_vars
+      def lazy_setup
         super
         @template = Input.new(type: :text)
         @min = 1
         @max = 10
       end
-
-      # def increment
-      #   super
-      #   @attributes[:value] = value
-      #   @index
-      # end
-      # 
-      # def reset
-      #   
-      #   @attributes[:value] = value
-      #   @index
-      # end
 
   end
 

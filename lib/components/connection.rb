@@ -1,8 +1,11 @@
 module DFormed
 
-  class Connection < Base
-    attr_reader :field, :expressions, :actions, :inactions
-    @@cache = {}
+  class Connection < BBLib::LazyClass
+
+    attr_str :field, serialize: true
+    attr_ary :expressions, :actions, :inactions, default: [], serialize: true
+
+    @@cache = Hash.new
 
     def compare field_a, field_b
       return unless match?(field_b.name)
@@ -10,11 +13,11 @@ module DFormed
     end
 
     def available_operators
-      @@cache[:operators] || (@@cache[:operators] = Operators.methods - Object.methods)
+      @@cache[:operators] ||= Operators.methods - Object.methods
     end
 
     def available_actions
-      @@cache[:actions] || (@@cache[:actions] = Actions.methods - Object.methods)
+      @@cache[:actions] ||= Actions.methods - Object.methods
     end
 
     def field= field
@@ -78,23 +81,7 @@ module DFormed
         end
       end
 
-      def setup_vars
-        @field = ''
-        @expressions = Array.new
-        @actions = Array.new
-        @inactions = Array.new
-      end
-
-      def serialize_fields
-        {
-          field: { send: :field, unless: ''},
-          expressions: { send: :expressions, unless: [] },
-          actions: { send: :actions, unless: [] },
-          inactions: { send: :inactions, unless: [] }
-        }
-      end
-
-      def custom_init *args
+      def lazy_init *args
         args.find_all{ |a| a.is_a?(Hash) }.each do |hash|
           hash.each do |k,v|
             case k

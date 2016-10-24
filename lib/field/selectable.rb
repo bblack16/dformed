@@ -2,14 +2,11 @@
 module DFormed
 
   class Selectable < Field
-    attr_reader :options, :type, :per_col
+    attr_hash :options, serialize: true
+    attr_int_between 1, nil, :per_col, default: 1, serialize: true
 
     def type= t
       @type = t if Selectable.type.include?(t)
-    end
-
-    def per_col= pc
-      @per_col = pc.to_i <= 1 ? 1 : pc.to_i
     end
 
     def value= val
@@ -72,20 +69,12 @@ module DFormed
         end.join
       end
 
-      def setup_vars
+      def lazy_setup
         super
         @options = {}
         @type = :radio
         @tagname = 'table'
         @per_col = 1
-      end
-
-      def serialize_fields
-        super.merge(
-          type: { send: :type },
-          options: { send: :options, unless: {} },
-          per_col: { send: :per_col, unless: 1 }
-        )
       end
 
   end

@@ -13,7 +13,7 @@ module DFormed
         nil
       end
 
-      def setup_vars
+      def lazy_setup
         super
         @tagname = 'hr'
       end

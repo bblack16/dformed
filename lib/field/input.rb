@@ -2,7 +2,6 @@
 module DFormed
 
   class Input < Field
-    attr_reader :type
 
     INPUT_TYPES = [
                     :text, :search, :tel, :color, :time, :datetime,
@@ -10,19 +9,11 @@ module DFormed
                     :range, :week, :month, :url
                   ]
 
+    after :value_to_attr, :default=, :value=
+
     def type= type
       @type              = INPUT_TYPES.include?(type) ? type : :text
       @attributes[:type] = @type
-    end
-
-    def value= v
-      super
-      @attributes[:value] = self.value
-    end
-
-    def default= d
-      super
-      @attributes[:value] = self.value
     end
 
     def self.type
@@ -35,10 +26,9 @@ module DFormed
         nil
       end
 
-      def serialize_fields
-        super.merge(
-          attributes: { send: :clean_attributes, unless: {} }
-        )
+      def lazy_setup
+        super
+        serialize_method :attributes, :clean_attributes, ignore: Hash.new
       end
 
       def clean_attributes
@@ -48,9 +38,13 @@ module DFormed
         temp
       end
 
-      def setup_vars
+      def lazy_setup
         super
         @tagname = 'input'
+      end
+
+      def value_to_attr
+        @attributes[:value] = self.value
       end
 
   end

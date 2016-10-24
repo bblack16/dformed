@@ -13,7 +13,7 @@ module DFormed
         value.to_s
       end
 
-      def setup_vars
+      def lazy_setup
         super
         @tagname = 'textarea'
         @template = TextArea.new

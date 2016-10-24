@@ -1,39 +1,44 @@
 
 module DFormed
 
-  class Form < ElementBase
-    include Valuable
-    attr_reader :fields, :last_id
+  class Form < ValueElement
+
+    after :check_field_names, :fields=, :add_fields
+
+    attr_array_of ElementBase, :fields, default: [], serialize: true, add_rem: true
+
+    alias_method :add, :add_fields
+    alias_method :add_field, :add_fields
 
     def field name
       @fields.find{ |f| f.name == name } rescue nil
     end
 
-    def add *hashes
-      hashes.each do |hash|
-        if hash.is_a?(ElementBase)
-          add_elem hash
-        elsif hash[:type]
-          add_elem hash
-        else # Supports a slightly different shorthand for convenience
-          hash.each do |k, v|
-            add_elem v.merge(type: k)
-          end
-        end
-      end
-    end
+    # def add *hashes
+    #   hashes.each do |hash|
+    #     if hash.is_a?(ElementBase)
+    #       add_elem hash
+    #     elsif hash[:type]
+    #       add_elem hash
+    #     else # Supports a slightly different shorthand for convenience
+    #       hash.each do |k, v|
+    #         add_elem v.merge(type: k)
+    #       end
+    #     end
+    #   end
+    # end
 
-    def add_at hash, index
-      if hash.is_a?(ElementBase)
-        add_elem hash, index
-      elsif hash[:type]
-        add_elem hash, index
-      else # Supports a slightly different shorthand for convenience
-        hash.each do |k, v|
-          add_elem v.merge(type: k), index
-        end
-      end
-    end
+    # def add_at hash, index
+    #   if hash.is_a?(ElementBase)
+    #     add_elem hash, index
+    #   elsif hash[:type]
+    #     add_elem hash, index
+    #   else # Supports a slightly different shorthand for convenience
+    #     hash.each do |k, v|
+    #       add_elem v.merge(type: k), index
+    #     end
+    #   end
+    # end
 
     def remove *names
       names.map do |name|
@@ -65,7 +70,7 @@ module DFormed
 
     def value
       @fields.map{ |f| f.is_a?(ElementBase) && f.respond_to?(:value) ? [f.name, f.value] : nil }
-        .reject{ |r| r.nil? }.to_h
+        .compact.to_h
     end
 
     def value= values
@@ -140,16 +145,20 @@ module DFormed
 
     protected
 
-      def add_elem hash, index = @fields.size
-        index          = @fields.size if index > @fields.size
-        index          = 0 if index < 0
-        elem           = hash.is_a?(ElementBase) ? hash : ElementBase.create(hash, self)
-        elem.name      = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
-        @fields.insert index, elem
-      end
-
-      def next_id
-        (@last_id += 1).to_s
+      def check_field_names
+        @fields.each do |field|
+          used = [nil]
+          count = 0
+          while used.include?(field.name)
+            field.name = "#{field.name}#{count += 1}"
+          end
+          used.push(field.name)
+        end
+        # index          = @fields.size if index > @fields.size
+        # index          = 0 if index < 0
+        # elem           = hash.is_a?(ElementBase) ? hash : ElementBase.create(hash, self)
+        # elem.name      = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
+        # @fields.insert index, elem
       end
 
       def inner_html
@@ -160,33 +169,14 @@ module DFormed
         '</tr></table>'
       end
 
-      def setup_vars
-        @last_id = 0
-        super
-        @fields = Array.new
-      end
-
-      def custom_init *args
-        hash = args.find{ |a| a.is_a?(Hash) }
-        if hash && hash.include?(:fields)
-          hash[:fields].each do |field|
-            add field
-          end
-        end
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            fields: { send: :fields_to_h },
-            type:   { send: :type }
-          }
-        )
-      end
-
-      def fields_to_h
-        @fields.map{ |f| f.to_h }
-      end
+      # def custom_init *args
+      #   hash = args.find{ |a| a.is_a?(Hash) }
+      #   if hash && hash.include?(:fields)
+      #     hash[:fields].each do |field|
+      #       add field
+      #     end
+      #   end
+      # end
 
   end
 

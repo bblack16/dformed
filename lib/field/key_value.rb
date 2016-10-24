@@ -3,6 +3,7 @@
 module DFormed
 
   class KeyValue < Field
+    attr_of Field, :key_field, :value_field, serialize: true
     attr_reader :key_field, :value_field
 
     def key_field= field
@@ -50,28 +51,6 @@ module DFormed
         [@key_field.to_html, @value_field.to_html].join
       end
 
-      def setup_vars
-        super
-        @key_field = nil
-        @value_field = nil
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            key_field: { send: :key_to_h, unless: nil },
-            value_field: { send: :value_to_h, unless: nil }
-          }
-        )
-      end
-
-      def key_to_h
-        @key_field.to_h
-      end
-
-      def value_to_h
-        @value_field.to_h
-      end
   end
 
 end
