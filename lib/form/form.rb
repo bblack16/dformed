@@ -1,67 +1,39 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class Form < ValueElement
-
     after :check_field_names, :fields=, :add_fields
 
-    attr_array_of ElementBase, :fields, default: [], serialize: true, add_rem: true
+    attr_array_of Element, :fields, default: [], serialize: true, add_rem: true
+    dont_serialize_method :value
 
-    alias_method :add, :add_fields
-    alias_method :add_field, :add_fields
+    alias add add_fields
+    alias add_field add_fields
 
-    def field name
-      @fields.find{ |f| f.name == name } rescue nil
+    def field(name)
+      @fields.find { |f| f.name == name } rescue nil
     end
 
-    # def add *hashes
-    #   hashes.each do |hash|
-    #     if hash.is_a?(ElementBase)
-    #       add_elem hash
-    #     elsif hash[:type]
-    #       add_elem hash
-    #     else # Supports a slightly different shorthand for convenience
-    #       hash.each do |k, v|
-    #         add_elem v.merge(type: k)
-    #       end
-    #     end
-    #   end
-    # end
-
-    # def add_at hash, index
-    #   if hash.is_a?(ElementBase)
-    #     add_elem hash, index
-    #   elsif hash[:type]
-    #     add_elem hash, index
-    #   else # Supports a slightly different shorthand for convenience
-    #     hash.each do |k, v|
-    #       add_elem v.merge(type: k), index
-    #     end
-    #   end
-    # end
-
-    def remove *names
+    def remove(*names)
       names.map do |name|
-        @fields.delete_if{ |f| f.name.to_s == name.to_s rescue false }
+        @fields.delete_if { |f| f.name.to_s == name.to_s rescue false }
       end.flatten
     end
 
-    def remove_at index
-      @fields.delete_at index
+    def remove_at(index)
+      @fields.delete_at(index)
     end
 
-    def replace name, field
+    def replace(name, field)
       index = index_of(name)
-      @fields.delete_at(index)
-      add_at field, index
+      raise ArgumentError, "Cannot find a matching field to replace for '#{name}'." unless index
+      @fields[index] = Element.create(field)
     end
 
-    def replace_at index, field
-      @fields.delete_at(index)
-      add_at field, index
+    def replace_at(index, field)
+      @fields[index] = Element.create(field)
     end
 
-    def index_of name
+    def index_of(name)
       @fields.each_with_index do |f, x|
         return x if (f.name.to_s == name.to_s) || name == f
       end
@@ -69,44 +41,42 @@ module DFormed
     end
 
     def value
-      @fields.map{ |f| f.is_a?(ElementBase) && f.respond_to?(:value) ? [f.name, f.value] : nil }
-        .compact.to_h
+      @fields.map { |f| f.is_a?(Element) && f.respond_to?(:value) ? [f.name, f.value] : nil }
+             .compact.to_h
     end
 
-    def value= values
+    def value=(values)
       @values = {}
       set values
     end
 
-    alias_method :values=, :value=
+    alias values= value=
 
-    def set hash
+    def set(hash)
       hash.each do |k, v|
-        field = @fields.find{ |f| f.name == k.to_s }
-        if field
-          field.value = v
-        end
+        field = @fields.find { |f| f.name == k.to_s }
+        field.value = v if field
       end
     end
 
-    def get name
-      @fields.find{ |f| f.name.to_s == name.to_s }
+    def get(name)
+      @fields.find { |f| f.name.to_s == name.to_s }
     end
 
-    def vget name
+    def vget(name)
       get(name).value
     end
 
     def clear
-      @fields.each{ |f| f.clear if f.respond_to?(:clear) }
+      @fields.each { |f| f.clear if f.respond_to?(:clear) }
     end
 
-    def field_changed field
-      @fields.each{ |f| f.check_connections(field) if f.respond_to?(:check_connections) }
+    def field_changed(field)
+      @fields.each { |f| f.check_connections(field) if f.respond_to?(:check_connections) }
     end
 
     def change_all_fields
-      @fields.each{ |f| field_changed f }
+      @fields.each { |f| field_changed f }
     end
 
     # These methods are only available if the engine is Opal
@@ -129,12 +99,12 @@ module DFormed
       end
 
       def retrieve_value
-        @fields.map{ |f| f.respond_to?(:retrieve_value) ? [f.name, f.retrieve_value] : nil }
-          .reject{ |r| r.nil? }.to_h
+        @fields.map { |f| f.respond_to?(:retrieve_value) ? [f.name, f.retrieve_value] : nil }
+               .reject(&:nil?).to_h
       end
 
       def reregister_field_events
-        @fields.each{ |f| f.reregister_events rescue nil }
+        @fields.each { |f| f.reregister_events rescue nil }
       end
 
     end
@@ -145,39 +115,22 @@ module DFormed
 
     protected
 
-      def check_field_names
-        @fields.each do |field|
-          used = [nil]
-          count = 0
-          while used.include?(field.name)
-            field.name = "#{field.name}#{count += 1}"
-          end
-          used.push(field.name)
+    def check_field_names
+      @fields.each do |field|
+        field.parent = self
+        used = [nil]
+        count = 0
+        while used.include?(field.name)
+          field.name = "#{field.name}#{count += 1}"
         end
-        # index          = @fields.size if index > @fields.size
-        # index          = 0 if index < 0
-        # elem           = hash.is_a?(ElementBase) ? hash : ElementBase.create(hash, self)
-        # elem.name      = next_id if elem.respond_to?(:name=) && elem.name.to_s == ''
-        # @fields.insert index, elem
+        used.push(field.name)
       end
+    end
 
-      def inner_html
-        '<table class="fields"><tr>' +
-        @fields.map do |field|
-          field.to_html
-        end.join('</tr><tr>') +
+    def inner_html
+      '<table class="fields"><tr>' +
+        @fields.map(&:to_html).join('</tr><tr>') +
         '</tr></table>'
-      end
-
-      # def custom_init *args
-      #   hash = args.find{ |a| a.is_a?(Hash) }
-      #   if hash && hash.include?(:fields)
-      #     hash[:fields].each do |field|
-      #       add field
-      #     end
-      #   end
-      # end
-
+    end
   end
-
 end

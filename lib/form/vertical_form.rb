@@ -1,8 +1,6 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class VerticalForm < Form
-
     def self.type
       [:vform, :vertical_form]
     end
@@ -14,7 +12,7 @@ module DFormed
         header = "<table class='fields'></table>"
         @element = Element[header]
         x = 0
-        until x >= @fields.size do
+        until x >= @fields.size
           row = Element['<tr class="form_row"><td class="label"/><td class="field"/></tr>']
           if @fields[x].is_a?(Label) && @fields[x+1] && !@fields[x+1].is_a?(Label)
             row.find('.label').append(@fields[x].to_element)
@@ -40,7 +38,5 @@ module DFormed
       end
 
     end
-
   end
-
 end

@@ -1,20 +1,19 @@
-
+# frozen_string_literal: true
 # This module is used for Elements that should contain a value
 # The methods added provide means of interacting with values from
-# a generic ElementBase and can be overwritten in subclasses if needed
+# a generic Element and can be overwritten in subclasses if needed
 module DFormed
-
   module Valuable
     attr_reader :value, :default
-    @connections = Hash.new
+    @connections = {}
     @default = nil
 
-    def value= val
+    def value=(val)
       @element.value = val if element? && @value != val
       @value = val
     end
 
-    def default= d
+    def default=(d)
       @default = d
     end
 
@@ -25,9 +24,7 @@ module DFormed
     def clear
       return if attributes.include?(:readonly)
       value = nil
-      if element?
-        @element.value = nil
-      end
+      @element.value = nil if element?
     end
 
     if DFormed.in_opal?
@@ -38,7 +35,5 @@ module DFormed
       end
 
     end
-
   end
-
 end

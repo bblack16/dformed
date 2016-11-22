@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 module DFormed
-  class TextArea < Field
+  class Code < Element
     def self.type
-      [:textarea, :text_area]
+      [:code]
     end
 
     protected
 
     def inner_html
-      value.to_s
+      "<code>#{value}</code>"
     end
 
-    def lazy_setup
+    def setup_vars
       super
-      @tagname = 'textarea'
+      @tagname = 'pre'
     end
   end
 end

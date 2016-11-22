@@ -1,8 +1,5 @@
-
 module DFormed
-
   class MultiSelect < Select
-
     def self.type
       [:multi_select, :multiselect]
     end
@@ -13,11 +10,9 @@ module DFormed
 
     protected
 
-      def lazy_setup
-        super
-        add_attribute :multiple, true
-      end
-
+    def lazy_setup
+      super
+      add_attribute multiple: true
+    end
   end
-
 end

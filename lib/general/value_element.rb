@@ -1,14 +1,14 @@
 
+# frozen_string_literal: true
 module DFormed
-
-  class ValueElement < ElementBase
+  class ValueElement < Element
     attr_of Object, :value, :default, serialize: true, allow_nil: true, ignore: nil
 
     def value
       @value || @default
     end
 
-    def value= val
+    def value=(val)
       @element.value = val if element? && @value != val
       @value = val
     end
@@ -16,9 +16,7 @@ module DFormed
     def clear
       return if attributes.include?(:readonly)
       value = nil
-      if element?
-        @element.value = nil
-      end
+      @element.value = nil if element?
     end
 
     if DFormed.in_opal?
@@ -27,9 +25,7 @@ module DFormed
         return nil unless @element
         @value = @element.value
       end
-      
+
     end
-
   end
-
 end

@@ -1,8 +1,6 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class Select < Selectable
-
     def self.type
       :select
     end
@@ -11,7 +9,7 @@ module DFormed
       :select
     end
 
-    def value= val
+    def value=(val)
       @value = val.to_s
       if element?
         @element.children('option').each do |opt|
@@ -29,19 +27,17 @@ module DFormed
 
     protected
 
-      def lazy_setup
-        super
-        @tagname = 'select'
-        @type = :select
-      end
+    def lazy_setup
+      super
+      @tagname = 'select'
+      @type = :select
+    end
 
-      def inner_html
-        @options.map do |k,v|
-          selected = [@value].flatten.include?(k.to_s)
-          "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
-        end.join("\n")
-      end
-
+    def inner_html
+      @options.map do |k, v|
+        selected = [@value].flatten.include?(k.to_s)
+        "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
+      end.join("\n")
+    end
   end
-
 end

@@ -1,21 +1,19 @@
-
-
+# frozen_string_literal: true
 module DFormed
-
-  class Button < ElementBase
+  class Button < Element
     attr_str :label, serialize: true
 
-    def disable t_or_f = true
-      t_or_f ? add_attribute('disabled', true) : remove_attribute('disabled')
+    def disable(t_or_f = true)
+      t_or_f ? add_attribute(disabled: true) : remove_attribute('disabled')
     end
 
-    alias_method :disable=, :disable
+    alias disable= disable
 
     def enable
       disable false
     end
 
-    alias_method :body=, :label=
+    alias body= label=
 
     def self.type
       [:button, :btn]
@@ -23,15 +21,13 @@ module DFormed
 
     protected
 
-      def inner_html
-        @label
-      end
+    def inner_html
+      @label
+    end
 
-      def lazy_setup
-        super
-        @tagname = 'button'
-      end
-
+    def lazy_setup
+      super
+      @tagname = 'button'
+    end
   end
-
 end
