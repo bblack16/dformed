@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 module DFormed
-  class Controller
-    attr_reader :forms
-
-    def initialize
-      @forms = {}
-    end
+  class Controller < BBLib::LazyClass
+    attr_bool :track_changes, default: false
+    attr_hash :forms, default: {}
+    attr_hash :originals, default: {}
 
     def add(form, id)
       form = JSON.parse(form) if form.is_a?(String)
@@ -26,7 +24,7 @@ module DFormed
       remove id
     end
 
-    def has_form?(id)
+    def form?(id)
       @forms.include?(id)
     end
 
@@ -42,12 +40,26 @@ module DFormed
       end
     end
 
+    def changed_values(id)
+      (originals[id] || {}).diff(values(id))
+    end
+
     def set(id, values)
       form(id).value = values
     end
 
     def clear(id)
       form(id).clear if form(id).respond_to? :clear
+    end
+
+    def reset(id)
+      return unless track_changes?
+      set(id, originals[id])
+    end
+
+    def update_original(id)
+      return unless track_changes?
+      originals[id] = values(id)
     end
 
     if DFormed.in_opal?
@@ -62,7 +74,7 @@ module DFormed
       end
 
       def download(url, id, selector = false, retain = true, options: {})
-        retain = false if retain && !has_form?(id)
+        retain = false if retain && !form?(id)
         HTTP.get(url, options) do |response|
           `console.log(#{response})`
           values = values(id) if retain
@@ -78,11 +90,13 @@ module DFormed
         fe = form(id).element || form(id).to_element
         form(id).reregister_field_events
         elem.append(fe)
+        update_original(id)
+        form(id)
       end
 
-      def send(id, url)
-        HTTP.post url, form(id) do |_response|
-          `console.log(response.json)`
+      def send_to(id, url)
+        HTTP.post url, form(id) do |response|
+          `console.log(#{response.json})`
         end
       end
 
