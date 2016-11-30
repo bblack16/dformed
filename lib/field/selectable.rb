@@ -24,7 +24,7 @@ module DFormed
       elsif options.is_a?(Hash)
         @options = options.map { |k, v| [k.to_s, v.to_s] }.to_h
       else
-        raise ArgumentError, 'The options argument must be a hash or array'
+        raise ArgumentError, "The options argument must be a Hash or Array, not a #{options.class}: #{options}"
       end
       if element?
         retrieve_value
