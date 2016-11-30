@@ -43,7 +43,7 @@ module DFormed
     end
 
     def attributes=(a)
-      @attributes = {}
+      @attributes = { dformed_class: self.class.to_s.sub('DFormed::', '') }
       add_attribute(a)
     end
 
