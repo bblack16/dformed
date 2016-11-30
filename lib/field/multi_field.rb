@@ -40,16 +40,6 @@ module DFormed
       @fields.size
     end
 
-    def to_html
-      add_value until size >= @min
-      '<div class="multi_container">' +
-        values.map do |_val|
-          html = '<div class="multi_field">' + super + make_buttons + '</div>'
-          increment
-          html
-        end.join + '</div>'
-    end
-
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
@@ -86,7 +76,7 @@ module DFormed
             remove_button(size <= @min),
             up_button(indx.zero?),
             down_button(indx == (size-1))
-          ].reject(&:nil?)
+          ].compact
           elem.append(buttons)
         end
       end
@@ -106,8 +96,8 @@ module DFormed
       end
 
       def clone(event)
-        id    = next_id
-        row   = Element["<div class='multi_field' mgf_sort=#{id}/>"]
+        id  = next_id
+        row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
         if @fields.empty?
           elm   = event.element.closest('div.empty_placeholder')
           new_f = generate_field
@@ -228,20 +218,6 @@ module DFormed
 
     def generate_field(val = nil)
       Element.create(@template.to_h.merge(value: val), @parent)
-    end
-
-    def make_buttons
-      if DFormed.in_opal?
-        ''
-      else
-        (cloneable ? "#{make_button('add', @add)}#{make_button('remove', @remove)}" : '') +
-          (moveable ? "#{make_button('up', @up)}#{make_button('down', @down)}" : '')
-      end
-    end
-
-    def make_button(klass, html, disabled = false)
-      dis = disabled ? ' disabled' : nil
-      "<button class='multi_button #{klass}#{dis}'#{dis}>#{html}</button>"
     end
   end
 end
