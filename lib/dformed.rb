@@ -17,7 +17,7 @@ unless RUBY_ENGINE == 'opal'
 end
 
 require_relative 'dformed/version'
-require_relative 'components/_components'
+require_relative 'connection/_connection'
 require_relative 'general/element'
 require_relative 'general/value_element'
 require_relative 'text/_requires'
