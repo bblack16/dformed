@@ -5,6 +5,11 @@ module DFormed
       [:textarea, :text_area]
     end
 
+    def value=(val)
+      @element.JS.val(val) if element? && @value != val
+      @value = val
+    end
+
     protected
 
     def inner_html
