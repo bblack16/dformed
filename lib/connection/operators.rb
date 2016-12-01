@@ -55,7 +55,7 @@ module DFormed
 
       singleton_class.send(:alias_method, :lte, :less_than_equal)
 
-      def within(val, exp)
+      def self.within(val, exp)
         if exp.is_a?(Array)
           exp.map(&:to_s).include?(val.to_s)
         else

@@ -59,10 +59,10 @@ module DFormed
       def self.replace_with(field, args)
         return unless field.respond_to?(:value)
         value = field.value
-        if value.is_a? String
-          field.value = args.to_s
-        elsif value.is_a? Array
+        if value.is_a? Array
           field.value = value.map { |_v| args.to_s }
+        else
+          field.value = args.to_s
         end
       end
 

@@ -1,5 +1,5 @@
 require_relative 'valuable'
-require_relative 'connectable'
-require_relative 'operators'
-require_relative 'actions'
+require_relative '../connection/connection'
+require_relative '../connection/operators'
+require_relative '../connection/actions'
 require_relative 'validateable'
