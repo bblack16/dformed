@@ -24,8 +24,8 @@ module DFormed
       # validate
     end
 
-    def updated
-      parent.field_changed(self)
+    def updated(field = self)
+      parent.field_changed(field) if parent
     end
 
     protected
