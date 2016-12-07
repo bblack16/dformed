@@ -4,6 +4,10 @@ module DFormed
   def self.in_opal?
     RUBY_ENGINE == 'opal'
   end
+
+  def self.jquery_ui?
+    in_opal? ? `typeof $.ui != 'undefined'` : false
+  end
 end
 
 unless RUBY_ENGINE == 'opal'
