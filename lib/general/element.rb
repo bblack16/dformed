@@ -136,6 +136,11 @@ module DFormed
 
     def self.create(hash, parent = nil)
       return hash if hash.is_a?(Element)
+      if Registry.preset?(hash[:type])
+        preset = Registry.preset[hash[:type]]
+        hash = preset.dup.deep_merge(hash)
+        hash[:type] = preset[:type]
+      end
       raise TypeError, "Could not locate a class to instantiate a field. Type given: #{hash[:type]}" unless Registry.include?(hash[:type].to_sym)
       hash[:parent] = parent
       Object.const_get(Registry.registry[hash[:type].to_sym].to_s).new(hash)
