@@ -32,5 +32,28 @@ module DFormed
       registry = {}
       load_registry(*namespaces)
     end
+
+    def self.presets
+      @presets ||= {}
+    end
+
+    class << self
+      alias preset presets
+    end
+
+    def self.add_preset(name, elem)
+      elem = elem.serialize if elem.is_a?(Element)
+      raise ArgumentError, "Element must be a hash. Cannot be a #{elem.class}." unless elem.is_a?(Hash)
+      raise ArgumentError, "Preset hashes must contain an element type." unless elem[:type]
+      presets[name.to_sym] = elem
+    end
+
+    def self.remove_preset(name)
+      presets.remove(name)
+    end
+
+    def self.preset?(name)
+      presets.include?(name)
+    end
   end
 end
