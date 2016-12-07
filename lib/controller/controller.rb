@@ -78,20 +78,19 @@ module DFormed
         HTTP.get(url, options) do |response|
           `console.log(#{response})`
           values = values(id) if retain
-          add response.json, id
-          set id, values if retain
-          render id, selector, values if selector
+          add(response.json, id)
+          set(id, values) if retain
+          render(id, selector, values) if selector
         end
       end
 
-      def render(id, selector)
-        elem = ::Element[selector].first
-        elem.empty
-        fe = form(id).element || form(id).to_element
-        form(id).reregister_field_events
-        elem.append(fe)
-        update_original(id)
-        form(id)
+      def render(id, selector, empty: false)
+        form(id).tap do |form|
+          elem = ::Element[selector].first
+          empty ? elem.empty : elem.children.detach
+          elem.append(form.element || form.to_element)
+          update_original(id)
+        end
       end
 
       def send_to(id, url)
