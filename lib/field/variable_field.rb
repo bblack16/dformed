@@ -6,11 +6,6 @@ module DFormed
       { type: :textarea },
       { type: :number },
       { type: :toggle }
-      # { type: :password },
-      # { type: :hash },
-      # { type: :multi_text },
-      # { type: :multi_number },
-      # { type: :color }
     ].freeze
 
     attr_ary_of Element, :fields, default: DEFAULT_FIELDS, serialize: true
