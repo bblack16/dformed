@@ -1,6 +1,8 @@
 require_relative 'field'
 require_relative 'multi_field'
 require_relative 'input'
+require_relative 'autocomplete'
+require_relative 'date_picker'
 require_relative 'textarea'
 require_relative 'multi_textarea'
 require_relative 'selectable'
