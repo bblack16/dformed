@@ -15,7 +15,8 @@ module DFormed
     after :value_to_attr, :default=, :value=
     after :type_to_attr, :type=
     before :convert_value, :value=, send_args: true, modify_args: true
-    after :convert_value, :value, :retrieve_value, send_value: true, modify_value: true
+    after :convert_value, :value, send_value: true, modify_value: true
+    after :convert_value, :retrieve_value, send_value: true, modify_value: true if DFormed.in_opal?
 
     def self.type
       INPUT_TYPES
@@ -54,9 +55,9 @@ module DFormed
       when :time, :datetime, :date, :datetime_local
         Time.parse(value)
       when :number, :range
-        value.to_f
+        value.respond_to?(:to_f) ? value.to_f : value.to_s.to_f
       when :week, :month
-        value.to_i
+        value.respond_to?(:to_f) ? value.to_i : value.to_s.to_i
       end
     end
   end
