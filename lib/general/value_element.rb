@@ -5,7 +5,7 @@ module DFormed
     attr_of Object, :value, :default, serialize: true, allow_nil: true, ignore: nil
 
     def value
-      @value || @default
+      @value ||= @default
     end
 
     def value=(val)
