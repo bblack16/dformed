@@ -92,7 +92,9 @@ module DFormed
       unless hash.include?(:method)
         hash = { method: hash.keys.first }.merge(hash.values.first)
       end
-      @events[hash[:method]] = { event: hash[:event], selector: hash[:selector] }
+      [hash[:method]].flatten.each do |method|
+        @events[method] = { event: hash[:event], selector: hash[:selector] }
+      end
       register_events
     end
 
