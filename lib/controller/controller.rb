@@ -80,7 +80,7 @@ module DFormed
           values = values(id) if retain
           add(response.json, id)
           set(id, values) if retain
-          render(id, selector, values) if selector
+          render(id, selector) if selector
         end
       end
 
