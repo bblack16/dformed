@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 module DFormed
   class JSONField < TextArea
+
+    after :parse_json, :to_element, :value= if DFormed.in_opal?
+
     def self.type
       [:json]
     end
