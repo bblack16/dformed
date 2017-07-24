@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module DFormed
-  class Connection < BBLib::LazyClass
+  class Connection
+    include BBLib::Effortless
+
     require_relative 'expression'
     require_relative 'action'
 
@@ -43,22 +45,22 @@ module DFormed
     protected
 
     def match?(name)
-      if @field.is_a?(Array)
-        @field.include?(name.to_s)
+      if field.is_a?(Array)
+        field.include?(name.to_s)
       else
-        @field.to_s == name.to_s
+        field.to_s == name.to_s
       end
     end
 
     def check(_a, b)
-      @expressions.all? { |exp| exp.check(b.value) }
+      expressions.all? { |exp| exp.check(b.value) }
     end
 
     def execute(field, *actions)
       actions.each { |action| action.execute(field) }
     end
 
-    def lazy_init(*args)
+    def simple_init(*args)
       args.find_all { |a| a.is_a?(Hash) }.each do |hash|
         hash.each do |k, v|
           if available_operators.include?(k)

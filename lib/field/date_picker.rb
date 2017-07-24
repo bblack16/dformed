@@ -14,7 +14,7 @@ module DFormed
       def to_element
         super
         create_date_picker if DFormed.jquery_ui?
-        @element
+        element
       end
 
     end
@@ -22,7 +22,7 @@ module DFormed
     protected
 
     def create_date_picker
-      @element.JS.datepicker({ format: format }.to_n)
+      element.JS.datepicker({ format: format }.to_n)
     rescue => e
       puts e
     end

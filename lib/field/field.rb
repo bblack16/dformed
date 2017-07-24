@@ -14,7 +14,7 @@ module DFormed
       def to_element
         super
         register_events
-        @element
+        element
       end
 
     end
@@ -34,7 +34,7 @@ module DFormed
       super
     end
 
-    def lazy_setup
+    def simple_setup
       super
       register_event method: :refresh, event: :change, selector: nil
       register_event method: :updated, event: :change, selector: nil

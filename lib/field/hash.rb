@@ -14,7 +14,7 @@ module DFormed
     attr_array :default, default: {}, add_rem: true, serialize: true
     attr_hash :options, default: { text: 'String', number: 'Integer', toggle: 'Boolean', multi_text: 'Array', hash: 'Hash', textarea: 'Text' }
 
-    after :change_options, :options=
+    after :options=, :change_options
 
     def self.type
       [:hash_field, :hash]
@@ -34,8 +34,7 @@ module DFormed
       id   = next_id
       row  = Element["<div class='multi_field' mgf_sort=#{id}/>"]
       type = event.element.siblings('.option').value
-      puts "TYPE: #{type}"
-      if @fields.empty?
+      if fields.empty?
         elm   = event.element.closest('div.empty_placeholder')
         new_f = generate_field(type)
         new_f.add_attribute(mgf_sort: id)
@@ -44,30 +43,30 @@ module DFormed
       else
         elm   = event.element.closest('div[mgf_sort]')
         sort  = elm.attr(:mgf_sort).to_i
-        f     = @fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
+        f     = fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
         new_f = generate_field(type, f.value)
         new_f.add_attribute(mgf_sort: id)
         row.append new_f.to_element
         elm.after(row)
       end
-      @fields.push new_f
+      fields.push new_f
       refresh_buttons
     end
 
     def options_elem
-      opts = Element.create(@buttons[:options].to_h)
+      opts = Element.create(buttons[:options].to_h)
       opts.to_element
     end
 
     def refresh_buttons
       retrieve_value
-      @element.find('.multi_field').each_with_index do |elem, indx|
+      element.find('.multi_field').each_with_index do |elem, indx|
         elem.find('button').remove
         # elem.find('.option').remove
         buttons = [
           # options_elem,
-          add_button(!@max.nil? && size >= @max),
-          remove_button(size <= @min),
+          add_button(!max.nil? && size >= max),
+          remove_button(size <= min),
           up_button(indx.zero?),
           down_button(indx == (size-1))
         ].compact
@@ -78,7 +77,7 @@ module DFormed
 
     protected
 
-    def lazy_setup
+    def simple_setup
       super
       change_options
     end
@@ -95,20 +94,20 @@ module DFormed
 
     def generate_fields
       values.each do |h|
-        @fields.push generate_field(type_guess(h.values.first), h)
+        fields.push generate_field(type_guess(h.values.first), h)
       end
-      @fields.push generate_field(:text) while @fields.size < @min
+      fields.push generate_field(:text) while fields.size < min
     end
 
     def generate_field(type, val = nil)
-      new_field = Element.create(@template.to_h, @parent)
+      new_field = Element.create(template.to_h, parent)
       new_field.value_field = Element.create(type: type || :text)
       new_field.value = val
       new_field
     end
 
     def change_options
-      @buttons[:options].options = @options
+      buttons[:options].options = options
     end
 
     def type_guess value

@@ -22,12 +22,12 @@ module DFormed
     protected
 
     def inner_html
-      @label
+      label
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'button'
+      self.tagname = 'button'
     end
   end
 end

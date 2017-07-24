@@ -6,7 +6,7 @@ module DFormed
     end
 
     def value=(val)
-      @element.JS.val(val) if element? && @value != val
+      element.JS.val(val) if element? && value != val
       @value = val
     end
 
@@ -16,9 +16,9 @@ module DFormed
       value.to_s
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'textarea'
+      self.tagname = 'textarea'
     end
   end
 end

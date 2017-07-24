@@ -13,7 +13,7 @@ module DFormed
     EMPTY_TEXT = '<i>Empty</i>'
 
     attr_int_between 0, nil, :min, default: 0, serialize: true
-    attr_int_between 0, nil, :max, default: nil, serialize: true
+    attr_int_between 0, nil, :max, default: nil, allow_nil: true, serialize: true
     attr_int_between 1, nil, :per_col, default: 1, serialize: true
     attr_of Element, :template, serialize: true
     attr_bool :cloneable, :moveable, default: true, serialize: true
@@ -21,7 +21,7 @@ module DFormed
     attr_hash :buttons, serialize: true, ignore: DEFAULT_BUTTONS
     attr_array :value, default: [], add_rem: true, serialize: true
     attr_array :default, default: [], add_rem: true, serialize: true
-    attr_array :fields, default: []
+    attr_array :fields, default: [], serialize: false
     attr_str :empty_text, default: EMPTY_TEXT, serialize: true
 
     def self.type
@@ -29,7 +29,7 @@ module DFormed
     end
 
     def template=(t)
-      @template = t.is_a?(Element) ? t : Element.create(t, @parent)
+      @template = t.is_a?(Element) ? t : Element.create(t, parent)
     end
 
     def values
@@ -37,43 +37,43 @@ module DFormed
     end
 
     def size
-      @fields.size
+      fields.size
     end
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
       def to_element
-        @element.empty if element?
-        @fields.clear
+        element.empty if element?
+        fields.clear
         reset_ids
-        @element = Element['<div class="multi_container"/>'] unless element?
+        self.element = Element['<div class="multi_container"/>'] unless element?
         generate_fields
-        if @fields.empty?
+        if fields.empty?
           refresh_empty
         else
-          @element.find('.empty_placeholder').remove
-          @fields.each_with_index do |ef, i|
+          element.find('.empty_placeholder').remove
+          fields.each_with_index do |ef, i|
             ef.labeled = false if i.positive? && ef.is_a?(GroupField)
             id = next_id
             ef.add_attribute(mgf_sort: id)
             row = Element["<div class='multi_field' mgf_sort='#{id}'/>"]
             row.append(ef.to_element)
-            @element.append(row)
+            element.append(row)
           end
           refresh_buttons
         end
         register_events
-        @element
+        element
       end
 
       def refresh_buttons
         retrieve_value
-        @element.find('.multi_field').each_with_index do |elem, indx|
+        element.find('.multi_field').each_with_index do |elem, indx|
           elem.find('button').remove
           buttons = [
-            add_button(!@max.nil? && size >= @max),
-            remove_button(size <= @min),
+            add_button(max && size >= max),
+            remove_button(size <= min),
             up_button(indx.zero?),
             down_button(indx == (size-1))
           ].compact
@@ -84,21 +84,21 @@ module DFormed
       def refresh_empty
         row = Element["<div class='multi_field empty_placeholder'>#{empty_text}</div>"]
         row.append(add_button)
-        @element.append(row)
+        element.append(row)
       end
 
       def retrieve_value
-        return [] unless @element && !@fields.empty?
-        order = @element.children('.multi_field').map { |e| e.attr(:mgf_sort) }
+        return [] unless element && !fields.empty?
+        order = element.children('.multi_field').map { |e| e.attr(:mgf_sort) }
         result = []
-        order.each { |i| result.push(@fields[i.to_i].retrieve_value) if @fields[i.to_i] }
-        @value = result
+        order.each { |i| result.push(fields[i.to_i].retrieve_value) if fields[i.to_i] }
+        self.value = result
       end
 
       def clone(event)
         id  = next_id
         row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
-        if @fields.empty?
+        if fields.empty?
           elm   = event.element.closest('div.empty_placeholder')
           new_f = generate_field
           new_f.add_attribute(mgf_sort: id)
@@ -107,24 +107,24 @@ module DFormed
         else
           elm   = event.element.closest('div[mgf_sort]')
           sort  = elm.attr(:mgf_sort).to_i
-          f     = @fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
+          f     = fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
           new_f = generate_field f.value
           new_f.add_attribute(mgf_sort: id)
           row.append new_f.to_element
           elm.after(row)
         end
-        @fields.push new_f
+        self.fields.push(new_f)
         refresh_buttons
       end
 
       def chop(event)
         elm = event.element.closest('div[mgf_sort]')
         sort = elm.attr(:mgf_sort).to_i
-        f = @fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
-        @fields.delete(f)
+        f = fields.find { |fl| fl.attributes[:mgf_sort].to_i == sort }
+        fields.delete(f)
         elm.remove
         refresh_buttons
-        refresh_empty if @fields.empty?
+        refresh_empty if fields.empty?
       end
 
       # Uses an event to move a field up or down in the current order
@@ -140,7 +140,7 @@ module DFormed
 
       def add_button(disabled = false)
         return nil unless cloneable && (!disabled || !hide_buttons)
-        btn = Element.create(@buttons[:add].to_h)
+        btn = Element.create(buttons[:add].to_h)
         btn.disable(disabled)
         btn = btn.to_element
         btn.on :click do |evt|
@@ -151,7 +151,7 @@ module DFormed
 
       def remove_button(disabled = false)
         return nil unless cloneable && (!disabled || !hide_buttons)
-        btn = Element.create(@buttons[:remove].to_h)
+        btn = Element.create(buttons[:remove].to_h)
         btn.disable(disabled)
         btn = btn.to_element
         btn.on :click do |evt|
@@ -162,7 +162,7 @@ module DFormed
 
       def up_button(disabled = false)
         return nil unless moveable && (!disabled || !hide_buttons)
-        btn = Element.create(@buttons[:up].to_h)
+        btn = Element.create(buttons[:up].to_h)
         btn.disable(disabled)
         btn = btn.to_element
         btn.on :click do |evt|
@@ -173,7 +173,7 @@ module DFormed
 
       def down_button(disabled = false)
         return nil unless moveable && (!disabled || !hide_buttons)
-        btn = Element.create(@buttons[:down].to_h)
+        btn = Element.create(buttons[:down].to_h)
         btn.disable(disabled)
         btn = btn.to_element
         btn.on :click do |evt|
@@ -186,10 +186,10 @@ module DFormed
 
     protected
 
-    def lazy_setup
+    def simple_setup
       reset_ids
       super
-      @buttons = default_buttons
+      self.buttons = default_buttons
     end
 
     def default_buttons
@@ -211,13 +211,13 @@ module DFormed
 
     def generate_fields
       values.each do |h|
-        @fields.push generate_field(h)
+        fields.push generate_field(h)
       end
-      @fields.push generate_field while @fields.size < @min
+      fields.push generate_field while fields.size < min
     end
 
     def generate_field(val = nil)
-      Element.create(@template.to_h.merge(value: val), @parent)
+      Element.create(template.to_h.merge(value: val), parent)
     end
   end
 end

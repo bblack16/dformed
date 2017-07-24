@@ -1,35 +1,30 @@
 # frozen_string_literal: true
 module DFormed
   class Selectable < Field
-    attr_hash :options, serialize: true
+    attr_of Options, :options, default: {}, serialize: true, pre_proc: proc { |x| x.is_a?(Hash) && (x.include?(:options) || x.include?(:url)) ? x : { options: x } }
     attr_int_between 1, nil, :per_col, default: 1, serialize: true
+    # attr_element_of [:radio, :checkbox], :type, default: :radio, serialize: true, always: true
 
-    def type=(t)
-      @type = t if Selectable.type.include?(t)
-    end
+    after :options=, :options_updated if DFormed.in_opal?
+    after :options=, :apply_parent, send_value: true
+
+    # def type=(t)
+    #   @type = t if Selectable.type.include?(t)
+    # end
 
     def value=(val)
-      @value = if @type == :checkbox
+      @value = if type == :checkbox
                  [val].flatten.map(&:to_s)
                else
                  val.to_s
                end
-      @element.html(to_html) if element?
-      # @element.find('radio, checkbox').prop('checked', false) if element?
+      element.html(to_html) if element?
     end
 
-    def options=(options)
-      if options.is_a?(Array)
-        @options = options.map { |o| [o.to_s, o.to_s] }.to_h
-      elsif options.is_a?(Hash)
-        @options = options.map { |k, v| [k.to_s, v.to_s] }.to_h
-      else
-        raise ArgumentError, "The options argument must be a Hash or Array, not a #{options.class}: #{options}"
-      end
-      if element?
-        retrieve_value
-        @element.html(to_html)
-      end
+    def options_updated
+      return unless element?
+      retrieve_value
+      element.html(to_html)
     end
 
     def self.type
@@ -44,11 +39,11 @@ module DFormed
     if DFormed.in_opal?
 
       def retrieve_value
-        self.value = case @type
+        self.value = case type
                      when :checkbox
-                       @element.find('input:checked').map(&:value)
+                       element.find('input:checked').map(&:value)
                      else
-                       @element.find('input:checked').value
+                       element.find('input:checked').value
                      end
       end
 
@@ -59,21 +54,22 @@ module DFormed
     def inner_html
       index = 0
       options.map do |v, c|
-        new_col = (index % @per_col).zero?
+        new_col = (index % per_col).zero?
         index+=1
         checked = [value].flatten.include?(v)
         "#{new_col ? '<tr>' : nil}<td>" \
-          "<input type='#{type}' value='#{v}' name='#{@name}'#{checked ? ' checked' : nil}>#{c}</input>" \
-          "</td>#{(index % @per_col).zero? ? '</tr>' : nil}"
+          "<input type='#{type}' value='#{v}' name='#{name}'#{checked ? ' checked' : nil}>#{c}</input>" \
+          "</td>#{(index % per_col).zero? ? '</tr>' : nil}"
       end.join
     end
 
-    def lazy_setup
+    def apply_parent obj
+      obj.parent = self
+    end
+
+    def simple_setup
       super
-      @options = {}
-      @type = :radio
-      @tagname = 'table'
-      @per_col = 1
+      self.tagname = 'table'
     end
   end
 end

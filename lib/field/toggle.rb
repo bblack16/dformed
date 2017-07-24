@@ -22,7 +22,7 @@ module DFormed
     if DFormed.in_opal?
 
       def retrieve_value
-        self.value = @element.is(':checked')
+        self.value = element.is(':checked')
       end
 
       def to_element
@@ -38,19 +38,19 @@ module DFormed
       nil
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'input'
+      self.tagname = 'input'
       setup_attributes
     end
 
     def setup_attributes
       add_attribute(name: name, type: :checkbox)
-      @element.prop(:checked, value) if element?
+      element.prop(:checked, value) if element?
     end
 
     def clean_attributes
-      temp = @attributes.dup
+      temp = attributes.dup
       temp.delete(:name)
       temp.delete(:type)
       temp

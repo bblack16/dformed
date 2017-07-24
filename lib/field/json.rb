@@ -10,7 +10,7 @@ module DFormed
 
     protected
 
-    def lazy_setup
+    def simple_setup
       super
       register_event method: :parse_json, event: :change, selector: nil
     end

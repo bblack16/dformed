@@ -17,7 +17,7 @@ module DFormed
       def to_element
         super
         create_auto_complete if DFormed.jquery_ui?
-        @element
+        element
       end
 
     end
@@ -25,7 +25,7 @@ module DFormed
     protected
 
     def create_auto_complete
-      @element.JS.autocomplete({ source: option_hash, delay: delay, minLength: min_length }.to_n)
+      element.JS.autocomplete({ source: option_hash, delay: delay, minLength: min_length }.to_n)
     rescue => e
       puts e
     end

@@ -9,6 +9,20 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
+        # @element = Element['<div/>']
+        # x = 0
+        # until x >= fields.size
+        #   row = Element['<div class="form_row">']
+        #   if fields[x].is_a?(Label) && fields[x + 1] && !fields[x + 1].is_a?(Label)
+        #     row.append(fields[x].to_element)
+        #     row.append(fields[x + 1].to_element)
+        #     x += 2
+        #   else
+        #     row.append(fields[x].to_element)
+        #   end
+        #   element.append(row)
+        # end
+        # element
         header = "<table class='fields'></table>"
         @element = Element[header]
         x = 0

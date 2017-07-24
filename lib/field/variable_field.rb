@@ -9,7 +9,7 @@ module DFormed
     ].freeze
 
     attr_ary_of Element, :fields, default: DEFAULT_FIELDS, serialize: true
-    attr_of Element, :field, default: { type: :text }
+    attr_of Element, :field, default: { type: :text }, serialize: false
 
     after :apply_parent, :field=
 
@@ -18,7 +18,7 @@ module DFormed
     end
 
     def value
-      { @field.type.to_sym => @field.value }
+      { field.type.to_sym => field.value }
     end
 
     def field_changed(field)
@@ -28,14 +28,14 @@ module DFormed
     def value=(val)
       if val.is_a?(Hash)
         change_field(val.keys.first.to_sym)
-        @field.value = val.values.first
+        field.value = val.values.first
       else
-        @field.value = val
+        field.value = val
       end
     end
 
     def change_field(type)
-      template = @fields.find { |f| f.type.to_s == type.to_s }.serialize rescue {}
+      template = fields.find { |f| f.type.to_s == type.to_s }.serialize rescue {}
       self.field = Element.create(template.merge(type: type.to_sym, value: retrieve_value.first.last))
       to_element
     end
@@ -45,16 +45,16 @@ module DFormed
 
       def to_element
         if element?
-          @element.children.remove
+          element.children.remove
         else
           @element = super
         end
-        @element.append(@field.to_element, type_select)
-        @element
+        element.append(field.to_element, type_select)
+        element
       end
 
       def retrieve_value
-        { @field.type.to_sym => @field.retrieve_value }
+        { field.type.to_sym => field.retrieve_value }
       end
 
       def type_select
@@ -73,7 +73,7 @@ module DFormed
     protected
 
     def apply_parent
-      @field.parent = self
+      field.parent = self
     end
 
   end

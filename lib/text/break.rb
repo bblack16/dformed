@@ -11,9 +11,9 @@ module DFormed
       nil
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'br'
+      self.tagname = 'br'
     end
   end
 end

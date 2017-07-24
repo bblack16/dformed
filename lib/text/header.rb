@@ -15,14 +15,14 @@ module DFormed
     protected
 
     def inner_html
-      @title
+      title
     end
 
     def refresh_tagname
-      @tagname = "h#{@size}"
+      self.tagname = "h#{size}"
     end
 
-    def lazy_init(*args)
+    def simple_init(*args)
       self.title = args.first if args.first.is_a?(String)
     end
   end

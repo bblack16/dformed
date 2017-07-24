@@ -6,8 +6,8 @@ module DFormed
 
     def label=(lbl)
       @label = lbl.to_s
-      @element.text(@label) if element?
-      self.name = @label.downcase.gsub(/\W|\s/, '_').gsub(/\_+/, '_') + '_label' if @name.to_s == ''
+      element.text(label) if element?
+      self.name = label.downcase.gsub(/\W|\s/, '_').gsub(/\_+/, '_') + '_label' if name.to_s == ''
     end
 
     def self.type
@@ -20,15 +20,15 @@ module DFormed
     protected
 
     def inner_html
-      @label
+      label
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname     = 'label'
+      self.tagname     = 'label'
     end
 
-    def lazy_init(*args)
+    def simple_init(*args)
       self.label = args.first if args.first.is_a?(String)
     end
   end

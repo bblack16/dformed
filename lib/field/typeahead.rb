@@ -9,7 +9,7 @@ module DFormed
     protected
 
     def create_auto_complete
-      @element.JS.autocomplete(
+      element.JS.autocomplete(
         {
           source: proc { |request, response| `response( $.ui.autocomplete.filter(#{option_hash}, request.term.split(/\s+/).pop() ) );` },
           delay: delay,

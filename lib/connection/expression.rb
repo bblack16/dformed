@@ -1,6 +1,8 @@
 module DFormed
   class Connection
-    class Expression < BBLib::LazyClass
+    class Expression
+      include BBLib::Effortless
+
       attr_of Object, :expression, serialize: true
       attr_sym :operator, default: :is, serialize: true, pre_proc: proc { |x| raise ArgumentError, "Invalid operator #{x}." unless Connection.available_operators.include?(x.to_sym); x }
       attr_bool :inverse, default: false

@@ -7,24 +7,20 @@ module DFormed
       [:paragraph, :p]
     end
 
-    def body=(body)
-      @body = body.to_s
-    end
-
     alias value= body=
 
     protected
 
     def inner_html
-      @body
+      body
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'p'
+      self.tagname = 'p'
     end
 
-    def lazy_init(*args)
+    def simple_init(*args)
       self.body = args.first if args.first.is_a?(String)
     end
   end

@@ -5,9 +5,9 @@ module DFormed
                    :multi_date, :multi_email, :multi_password, :multi_datetime_local, :multi_number,
                    :multi_range, :multi_week, :multi_month, :multi_url].freeze
 
-    after :add_type_attribute, :type=
+    after :add_type_attribute,:type=
     before :to_multi, :type=, send_args: true, modify_args: true
-    attr_element_of INPUT_TYPES, :type, default: :text, serialize: true, always: true
+    attr_element_of INPUT_TYPES, :type, default: :multi_text, serialize: true, always: true
 
     def self.type
       INPUT_TYPES
@@ -15,14 +15,14 @@ module DFormed
 
     protected
 
-    def lazy_setup
+    def simple_setup
       super
-      @template = Input.new(type: :text)
+      self.template = Input.new(type: :text)
     end
 
     def add_type_attribute
-      stype = @type.to_s.sub('multi_', '').to_sym
-      @template = Input.new(type: stype)
+      stype = type.to_s.sub('multi_', '').to_sym
+      self.template = Input.new(type: stype)
     end
 
     def to_multi type

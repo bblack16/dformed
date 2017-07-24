@@ -2,16 +2,16 @@ module DFormed
   class MultiSelect < Select
 
     def value
-      @value ||= @default
+      @value ||= default
     end
 
     def value=(val)
       @value = [val].flatten
       return @value unless element?
-      @element.children('option').each do |opt|
-        opt.attr('selected', @value.include?(opt.attr('value')))
+      element.children('option').each do |opt|
+        opt.attr('selected', value.include?(opt.attr('value')))
       end
-      @value
+      value
     end
 
     def self.type
@@ -24,7 +24,7 @@ module DFormed
 
     protected
 
-    def lazy_setup
+    def simple_setup
       super
       add_attribute multiple: true
     end

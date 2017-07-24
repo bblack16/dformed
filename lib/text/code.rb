@@ -13,7 +13,7 @@ module DFormed
 
     def setup_vars
       super
-      @tagname = 'pre'
+      self.tagname = 'pre'
     end
   end
 end

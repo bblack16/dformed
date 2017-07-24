@@ -11,10 +11,10 @@ module DFormed
       value.to_s
     end
 
-    def lazy_setup
+    def simple_setup
       super
-      @tagname = 'textarea'
-      @template = TextArea.new
+      self.tagname = 'textarea'
+      self.template = TextArea.new
     end
   end
 end

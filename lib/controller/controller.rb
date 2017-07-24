@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 module DFormed
-  class Controller < BBLib::LazyClass
+  class Controller
+    include BBLib::Effortless
+
     attr_bool :track_changes, default: false
-    attr_hash :forms, default: {}
-    attr_hash :originals, default: {}
+    attr_hash :forms, default: {}, serialize: false
+    attr_hash :originals, default: {}, serialize: false
 
     def add(form, id)
-      form = JSON.parse(form) if form.is_a?(String)
-      form[:type] = :form unless form.include?(:type)
-      @forms[id.to_s] = Element.create(form, nil)
+      unless form.is_a?(Element)
+        form = JSON.parse(form) if form.is_a?(String)
+        form[:type] = :form unless form.include?(:type)
+      end
+      forms[id.to_s] = Element.create(form, nil)
     end
 
     def form(id)
-      @forms[id]
+      forms[id]
     end
 
     def remove(id)
-      @forms.delete id
+      forms.delete id
     end
 
     def delete(id)
@@ -25,7 +29,7 @@ module DFormed
     end
 
     def form?(id)
-      @forms.include?(id)
+      forms.include?(id)
     end
 
     def clone(from, to)
@@ -80,7 +84,7 @@ module DFormed
           values = values(id) if retain
           add(response.json, id)
           set(id, values) if retain
-          render(id, selector, values) if selector
+          render(id, selector) if selector
         end
       end
 
