@@ -27,5 +27,9 @@ module DFormed
       end
 
     end
+
+    def compile_attributes
+      (super + " name='#{name}'").strip
+    end
   end
 end
