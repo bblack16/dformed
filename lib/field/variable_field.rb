@@ -5,7 +5,8 @@ module DFormed
       { type: :text },
       { type: :textarea },
       { type: :number },
-      { type: :toggle }
+      { type: :toggle },
+      { type: :'datetime-local' }
     ].freeze
 
     attr_ary_of Element, :fields, default: DEFAULT_FIELDS, serialize: true
