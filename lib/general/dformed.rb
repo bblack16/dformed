@@ -1,10 +1,14 @@
 module DFormed
 
-  def self.form_for obj, *ignore, form: DFormed::VerticalForm.new
-    return {} unless obj.is_a?(BBLib::LazyClass) || obj.is_a?(Class)
+  def self.form_for obj, *ignore, form: DFormed::VerticalForm.new, serialized_only: true, private: false, protected: false
+    return form unless obj.is_a?(BBLib::Effortless) || obj.is_a?(Class) && obj.respond_to?(:_attrs)
     return obj.dformed_form(form) if obj.respond_to?(:dformed_form)
-    settings = obj.attrs.map do |method, data|
+    settings = obj._attrs.map do |method, data|
       next if ignore.include?(method)
+      next if data[:options].include?(:dformed_field) && !data[:options][:dformed_field]
+      next if data[:options].include?(:serialize) && !data[:options][:serialize] && serialized_only
+      next if data[:options].include?(:protected) && data[:options][:protected] && !protected
+      next if data[:options].include?(:private) && data[:options][:private] && !private
       data = data.merge(value: obj.send(method)) unless obj.is_a?(Class)
       form.add(type: :label, label: method.to_clean_sym.to_s.tr('_', ' ').title_case)
       form.add(field_for(method, data, is_class: obj.is_a?(Class)))
@@ -15,28 +19,70 @@ module DFormed
   def self.field_for method, data, is_class: false
     value = (is_class ? data[:options][:default] : data[:value])
     field = case data[:type]
-    when :string, :valid_dir, :valid_file
+    when :string, :dir, :file, :symbol
       { name: method, value: value, type: :text }
-    when :int, :float, :int_between, :float_between
+    when :integer, :float, :integer_between, :float_between
       { name: method, value: value, type: :number }
-    when :array, :array_of
+    when :array
       { name: method, value: value, type: :multi_text }
+    when :date
+      { name: method, value: value, type: :date }
     when :time
-      { name: method, value: value, type: :datetime }
-    when :bool
+      { name: method, value: value, type: :'datetime-local' }
+    when :boolean
       { name: method, value: value, type: :toggle }
-    when :symbol
-      { name: method, value: value, type: :text }
     when :element_of
       { name: method, value: value, options: data[:options][:list], type: :select }
     when :hash
-      # template = { name: method, key_field: { type: :text }, value_field: { type: :text }, type: :key_value }
-      { type: :hash, name: method, value: value }
+      { type: :json, name: method, value: value }
+    when :of
+      field_for_class(method, data[:options][:classes]).merge(value: value)
+      # { name: method, value: value, type: :text }
+    when :array_of
+      { name: method, value: value, type: :multi_field, template: field_for_class(method, data[:options][:classes]) }
     else
       { name: method, value: value, type: :text }
     end
     field.delete(:value) unless value
     field
   end
+
+  DEFAULT_FIELD_MAPPING = {
+    text:     [String, Symbol, File, Dir],
+    datetime: [Time, Date],
+    number:   [Integer, Float],
+    boolean:  [TrueClass, FalseClass],
+    json:     [Hash, Array]
+  }
+
+  def self.field_mapping
+    @field_mapping ||= DEFAULT_FIELD_MAPPING
+  end
+
+  def self.field_mapping_for(klass)
+    field_mapping.find { |k, v| v.include?(klass) }.first
+  rescue => e
+    :text
+  end
+
+  def self.field_for_class(name, *klass)
+    klass = klass.flatten
+    if klass.size == 1
+      if !field_mapping.values.include?(klass.first) && klass.first.respond_to?(:_attrs)
+        return { name: name, type: :group_field, fields: form_for(klass.first).serialize(true)[:fields].reject { |f| f[:type] == :label } }
+      else
+        type = field_mapping_for(klass.first)
+      end
+    else
+      types = klass.map { |c| field_mapping_for(c) }.uniq
+      if types.size == 1
+        type = types.first
+      else
+        return { name: name, type: :variable_field, fields: types }
+      end
+    end
+    { name: name, type: type }
+  end
+
 
 end
