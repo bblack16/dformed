@@ -197,7 +197,7 @@ module DFormed
     end
 
     def compile_attributes
-      attributes.map { |k, v| "#{k}='#{v}'" }.join ' ' unless attributes.empty?
+      attributes.map { |k, v| "#{k}='#{v}'" }.join(' ') unless attributes.empty?
     end
 
     def element?
