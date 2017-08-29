@@ -2,7 +2,7 @@
 module DFormed
   class JSONField < TextArea
 
-    after :parse_json, :to_element, :value= if DFormed.in_opal?
+    after :to_element, :value=, :parse_json if DFormed.in_opal?
 
     def self.type
       [:json]
