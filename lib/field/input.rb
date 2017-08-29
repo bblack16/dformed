@@ -4,7 +4,7 @@ module DFormed
   class Input < Field
     INPUT_TYPES = [
       :text, :search, :tel, :color, :time, :datetime,
-      :date, :email, :password, :datetime_local, :number,
+      :date, :email, :password, :'datetime-local', :number,
       :range, :week, :month, :url
     ].freeze
 
@@ -52,8 +52,10 @@ module DFormed
       case type
       when :text, :search, :tel, :color, :email, :password, :url
         value.to_s
-      when :time, :datetime, :date, :datetime_local
-        Time.parse(value)
+      when :time, :datetime
+        (Time.parse(value.to_s) rescue Time.now).strftime('%Y-%m-%d %H:%M:%S')
+      when :date, :'datetime-local'
+        (Time.parse(value.to_s) rescue Time.now).strftime('%Y-%m-%d')
       when :number, :range
         value.respond_to?(:to_f) ? value.to_f : value.to_s.to_f
       when :week, :month
