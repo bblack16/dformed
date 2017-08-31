@@ -32,12 +32,11 @@ module DFormed
     when :boolean
       { name: method, value: value, type: :toggle }
     when :element_of
-      { name: method, value: value, options: data[:options][:list], type: :select }
+      { name: method, value: value, options: data[:options][:list] || [], type: :select }
     when :hash
       { type: :json, name: method, value: value }
     when :of
       field_for_class(method, data[:options][:classes]).merge(value: value)
-      # { name: method, value: value, type: :text }
     when :array_of
       { name: method, value: value, type: :multi_field, template: field_for_class(method, data[:options][:classes]) }
     else

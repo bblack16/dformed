@@ -4,10 +4,10 @@ module DFormed
   # Basically, a field that can have multiple instances of itself
   class MultiField < Field
     DEFAULT_BUTTONS = {
-      add:    DFormed::Button.new(label: '+'),
-      remove: DFormed::Button.new(label: '-'),
-      up:     DFormed::Button.new(label: '^'),
-      down:   DFormed::Button.new(label: 'v')
+      add:    DFormed::Button.new(label: '', class: 'fa fa-plus'),
+      remove: DFormed::Button.new(label: '', class: 'fa fa-minus'),
+      up:     DFormed::Button.new(label: '', class: 'fa fa-arrow-up'),
+      down:   DFormed::Button.new(label: '', class: 'fa fa-arrow-down')
     }.map { |n, b| [n, b.serialize] }.to_h
 
     EMPTY_TEXT = '<i>Empty</i>'
@@ -57,7 +57,7 @@ module DFormed
             ef.labeled = false if i.positive? && ef.is_a?(GroupField)
             id = next_id
             ef.add_attribute(mgf_sort: id)
-            row = Element["<div class='multi_field' mgf_sort='#{id}'/>"]
+            row = Element["<div class='multi_field btn-group' mgf_sort='#{id}'/>"]
             row.append(ef.to_element)
             element.append(row)
           end
@@ -97,7 +97,7 @@ module DFormed
 
       def clone(event)
         id  = next_id
-        row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
+        row = Element["<div class='multi_field btn-group' mgf_sort=#{id}/>"]
         if fields.empty?
           elm   = event.element.closest('div.empty_placeholder')
           new_f = generate_field
@@ -194,10 +194,10 @@ module DFormed
 
     def default_buttons
       {
-        add:    DFormed::Button.new(label: '+'),
-        remove: DFormed::Button.new(label: '-'),
-        up:     DFormed::Button.new(label: '^'),
-        down:   DFormed::Button.new(label: 'v')
+        add:    DFormed::Button.new(label: '', class: 'fa fa-plus btn btn-outline-success btn-sm'),
+        remove: DFormed::Button.new(label: '', class: 'fa fa-minus btn btn-outline-warning btn-sm'),
+        up:     DFormed::Button.new(label: '', class: 'fa fa-arrow-up btn btn-outline-info btn-sm'),
+        down:   DFormed::Button.new(label: '', class: 'fa fa-arrow-down btn btn-outline-info btn-sm')
       }
     end
 

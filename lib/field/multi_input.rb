@@ -5,8 +5,8 @@ module DFormed
                    :multi_date, :multi_email, :multi_password, :multi_datetime_local, :multi_number,
                    :multi_range, :multi_week, :multi_month, :multi_url].freeze
 
-    after :add_type_attribute,:type=
-    before :to_multi, :type=, send_args: true, modify_args: true
+    after :type=, :add_type_attribute
+    before :type=, :to_multi, send_args: true, modify_args: true
     attr_element_of INPUT_TYPES, :type, default: :multi_text, serialize: true, always: true
 
     def self.type
