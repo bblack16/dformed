@@ -5,7 +5,7 @@ module DFormed
     return obj.dformed_form(form) if obj.respond_to?(:dformed_form)
     settings = obj._attrs.map do |method, data|
       next if ignore.include?(method)
-      next if data[:options].include?(:dformed_field) && !data[:options][:dformed_field]
+      next if data[:options].include?(:dformed) && !data[:options][:dformed]
       next if data[:options].include?(:serialize) && !data[:options][:serialize] && serialized_only
       next if data[:options].include?(:protected) && data[:options][:protected] && !protected
       next if data[:options].include?(:private) && data[:options][:private] && !private
@@ -20,27 +20,27 @@ module DFormed
     value = (is_class ? data[:options][:default] : data[:value])
     field = case data[:type]
     when :string, :dir, :file, :symbol
-      { name: method, value: value, type: :text }
+      { name: method, value: value, type: data[:options][:dformed_type] || :text }
     when :integer, :float, :integer_between, :float_between
-      { name: method, value: value, type: :number }
+      { name: method, value: value, type: data[:options][:dformed_type] || :number }
     when :array
-      { name: method, value: value, type: :multi_text }
+      { name: method, value: value, type: data[:options][:dformed_type] || :multi_text }
     when :date
-      { name: method, value: value, type: :date }
+      { name: method, value: value, type: data[:options][:dformed_type] || :date }
     when :time
-      { name: method, value: value, type: :'datetime-local' }
+      { name: method, value: value, type: data[:options][:dformed_type] || :'datetime-local' }
     when :boolean
-      { name: method, value: value, type: :toggle }
+      { name: method, value: value, type: data[:options][:dformed_type] || :toggle }
     when :element_of
       { name: method, value: value, options: data[:options][:list] || [], type: :select }
     when :hash
-      { type: :json, name: method, value: value }
+      { type: data[:options][:dformed_type] || :json, name: method, value: value }
     when :of
       field_for_class(method, data[:options][:classes]).merge(value: value)
     when :array_of
-      { name: method, value: value, type: :multi_field, template: field_for_class(method, data[:options][:classes]) }
+      { name: method, value: value, type: data[:options][:dformed_type] || :multi_field, template: field_for_class(method, data[:options][:classes]) }
     else
-      { name: method, value: value, type: :text }
+      { name: method, value: value, type: data[:options][:dformed_type] || :text }
     end
     field.delete(:value) unless value
     field
