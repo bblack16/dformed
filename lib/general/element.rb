@@ -84,8 +84,8 @@ module DFormed
                  { key => value }
                end
       styles.each do |k, v|
-        styles[k.to_s] = v.to_s
         element.css(k.to_s, v.to_s) if element?
+        self.styles[k.to_s] = v.to_s
       end
     end
 
