@@ -3,7 +3,7 @@ module DFormed
   def self.form_for obj, *ignore, form: DFormed::VerticalForm.new, serialized_only: true, private: false, protected: false
     return form unless obj.is_a?(BBLib::Effortless) || obj.is_a?(Class) && obj.respond_to?(:_attrs)
     return obj.dformed_form(form) if obj.respond_to?(:dformed_form)
-    settings = obj._attrs.map do |method, data|
+    settings = obj._attrs.sort_by { |k, v| v[:options][:dformed_sort] || 1000 }.to_h.map do |method, data|
       next if ignore.include?(method)
       next if data[:options].include?(:dformed) && !data[:options][:dformed]
       next if data[:options].include?(:serialize) && !data[:options][:serialize] && serialized_only
@@ -18,29 +18,33 @@ module DFormed
 
   def self.field_for method, data, is_class: false
     value = (is_class ? data[:options][:default] : data[:value])
-    field = case data[:type]
-    when :string, :dir, :file, :symbol
-      { name: method, value: value, type: data[:options][:dformed_type] || :text }
-    when :integer, :float, :integer_between, :float_between
-      { name: method, value: value, type: data[:options][:dformed_type] || :number }
-    when :array
-      { name: method, value: value, type: data[:options][:dformed_type] || :multi_text }
-    when :date
-      { name: method, value: value, type: data[:options][:dformed_type] || :date }
-    when :time
-      { name: method, value: value, type: data[:options][:dformed_type] || :'datetime-local' }
-    when :boolean
-      { name: method, value: value, type: data[:options][:dformed_type] || :toggle }
-    when :element_of
-      { name: method, value: value, options: data[:options][:list] || [], type: :select }
-    when :hash
-      { type: data[:options][:dformed_type] || :json, name: method, value: value }
-    when :of
-      field_for_class(method, data[:options][:classes]).merge(value: value)
-    when :array_of
-      { name: method, value: value, type: data[:options][:dformed_type] || :multi_field, template: field_for_class(method, data[:options][:classes]) }
+    if field = data[:options][:dformed_field]
+      field = field.merge(value: value)
     else
-      { name: method, value: value, type: data[:options][:dformed_type] || :text }
+      field = case data[:type]
+      when :string, :dir, :file, :symbol
+        { name: method, value: value, type: data[:options][:dformed_type] || :text }
+      when :integer, :float, :integer_between, :float_between
+        { name: method, value: value, type: data[:options][:dformed_type] || :number }
+      when :array
+        { name: method, value: value, type: data[:options][:dformed_type] || :multi_text }
+      when :date
+        { name: method, value: value, type: data[:options][:dformed_type] || :date }
+      when :time
+        { name: method, value: value, type: data[:options][:dformed_type] || :'datetime-local' }
+      when :boolean
+        { name: method, value: value, type: data[:options][:dformed_type] || :toggle }
+      when :element_of
+        { name: method, value: value, options: data[:options][:list] || [], type: :select }
+      when :hash
+        { type: data[:options][:dformed_type] || :json, name: method, value: value }
+      when :of
+        field_for_class(method, data[:options][:classes]).merge(value: value)
+      when :array_of
+        { name: method, value: value, type: data[:options][:dformed_type] || :multi_field, template: field_for_class(method, data[:options][:classes]) }
+      else
+        { name: method, value: value, type: data[:options][:dformed_type] || :text }
+      end
     end
     field.delete(:value) unless value
     field
