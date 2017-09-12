@@ -54,6 +54,7 @@ module DFormed
     end
 
     def add_attribute(hash)
+      attributes
       hash.each do |k, v|
         attributes[k.to_sym] = v.to_s
         element.attr(k.to_s, v.to_s) if element?
