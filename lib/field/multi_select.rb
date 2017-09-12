@@ -27,6 +27,7 @@ module DFormed
     def simple_setup
       super
       add_attribute multiple: true
+      self.include_blank = false
     end
   end
 end

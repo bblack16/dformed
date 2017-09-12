@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 module DFormed
   class Select < Selectable
+    attr_bool :include_blank, default: true
     # attr_element_of [:select], :type, default: :select, serialize: true, always: true
 
     def self.type
@@ -35,6 +36,7 @@ module DFormed
     end
 
     def inner_html
+      (include_blank? ? "<option value=''/>\n" : '') +
       options.map do |k, v|
         selected = [value].flatten.include?(k.to_s)
         "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
