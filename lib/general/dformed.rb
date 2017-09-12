@@ -1,8 +1,8 @@
 module DFormed
 
-  def self.form_for obj, *ignore, form: DFormed::VerticalForm.new, serialized_only: true, private: false, protected: false
+  def self.form_for obj, *ignore, form: DFormed::VerticalForm.new, serialized_only: true, private: false, protected: false, bypass: false
     return form unless obj.is_a?(BBLib::Effortless) || obj.is_a?(Class) && obj.respond_to?(:_attrs)
-    return obj.dformed_form(form) if obj.respond_to?(:dformed_form)
+    return obj.dformed_form(form) if obj.respond_to?(:dformed_form) && !bypass
     settings = obj._attrs.sort_by { |k, v| v[:options][:dformed_sort] || 1000 }.to_h.map do |method, data|
       next if ignore.include?(method)
       next if data[:options].include?(:dformed) && !data[:options][:dformed]
@@ -19,7 +19,7 @@ module DFormed
   def self.field_for method, data, is_class: false
     value = (is_class ? data[:options][:default] : data[:value])
     if field = data[:options][:dformed_field]
-      field = field.merge(value: value)
+      field = field.merge(value: value, name: method)
     else
       field = case data[:type]
       when :string, :dir, :file, :symbol
@@ -34,8 +34,10 @@ module DFormed
         { name: method, value: value, type: data[:options][:dformed_type] || :'datetime-local' }
       when :boolean
         { name: method, value: value, type: data[:options][:dformed_type] || :toggle }
-      when :element_of
-        { name: method, value: value, options: data[:options][:list] || [], type: :select }
+      when :element_of, :elements_of
+        list = data[:options][:list] || []
+        list = list.call if list.is_a?(Proc)
+        { name: method, value: value, options: list, type: (data[:type] == :element_of ? :select : :multi_select) }
       when :hash
         { type: data[:options][:dformed_type] || :json, name: method, value: value }
       when :of
