@@ -38,7 +38,7 @@ module DFormed
     def inner_html
       (include_blank? ? "<option value=''/>\n" : '') +
       options.map do |k, v|
-        selected = [value].flatten.include?(k.to_s)
+        selected = [value].flatten.map(&:to_s).include?(k.to_s)
         "<option value='#{k}'#{selected ? ' selected' : nil}>#{v}</option>"
       end.join("\n")
     end
