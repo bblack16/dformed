@@ -9,7 +9,7 @@ module DFormed
       @value = [val].flatten
       return @value unless element?
       element.children('option').each do |opt|
-        opt.attr('selected', value.include?(opt.attr('value')))
+        opt.prop('selected', value.map(&:to_s).include?(opt.attr('value')))
       end
       value
     end
