@@ -10,7 +10,7 @@ module DFormed
     alias add_field add_fields
 
     def field(name)
-      fields.find { |f| f.name == name } rescue nil
+      fields.find { |f| f.name.to_s == name.to_s } rescue nil
     end
 
     def remove(*names)
