@@ -3,10 +3,9 @@ module DFormed
   def self.form_for obj, *ignore, form: DFormed::VerticalForm.new, serialized_only: true, private: false, protected: false, bypass: false
     return form unless obj.is_a?(BBLib::Effortless) || obj.is_a?(Class) && obj.respond_to?(:_attrs)
     return obj.dformed_form(form) if obj.respond_to?(:dformed_form) && !bypass
-    settings = obj._attrs.sort_by { |k, v| v[:options][:dformed_sort] || 1000 }.to_h.map do |method, data|
+    settings = obj._attrs.sort_by { |k, v| v[:options][:dformed_sort] || 0 }.to_h.map do |method, data|
       next if ignore.include?(method)
-      next if data[:options].include?(:dformed) && !data[:options][:dformed]
-      next if data[:options].include?(:serialize) && !data[:options][:serialize] && serialized_only
+      next if data[:options].include?(:dformed) && (!data[:options][:dformed] || data[:options].include?(:serialize) && !data[:options][:serialize] && serialized_only)
       next if data[:options].include?(:protected) && data[:options][:protected] && !protected
       next if data[:options].include?(:private) && data[:options][:private] && !private
       data = data.merge(value: obj.send(method)) unless obj.is_a?(Class)
