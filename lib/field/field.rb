@@ -2,6 +2,9 @@
 # frozen_string_literal: true
 module DFormed
   class Field < ValueElement
+    attr_str :label, allow_nil: true, default_proc: proc { |x| x.name.to_s.gsub('_', ' ').title_case }
+    attr_bool :labeled, default: true
+
     serialize_method :events, ignore: { refresh: { event: :change, selector: nil }, updated: { event: :change, selector: nil } }
 
     def self.type
