@@ -9,7 +9,6 @@ module DFormed
       next if data[:options].include?(:protected) && data[:options][:protected] && !protected
       next if data[:options].include?(:private) && data[:options][:private] && !private
       data = data.merge(value: obj.send(method)) unless obj.is_a?(Class)
-      form.add(type: :label, label: method.to_clean_sym.to_s.tr('_', ' ').title_case)
       form.add(field_for(method, data, is_class: obj.is_a?(Class)))
     end
     form
