@@ -30,6 +30,10 @@ module DFormed
       self.name == name.to_s
     end
 
+    def self.type
+      :abstract
+    end
+
     def type
       [self.class.type].flatten.first
     rescue => e
@@ -186,11 +190,11 @@ module DFormed
     end
 
     def compile_id
-      "id='#{id}'" unless id.nil? || id == ''
+      "id='#{attribute_escape(id)}'" unless id.nil? || id == ''
     end
 
     def compile_classes
-      "class='#{classes.join ' '}'" unless classes.empty?
+      "class='#{attribute_escape(classes.join(' '))}'" unless classes.empty?
     end
 
     def compile_style
@@ -198,7 +202,11 @@ module DFormed
     end
 
     def compile_attributes
-      attributes.map { |k, v| "#{k}='#{v}'" }.join(' ') unless attributes.empty?
+      attributes.map { |k, v| "#{k}='#{attribute_escape(v)}'" }.join(' ') unless attributes.empty?
+    end
+
+    def attribute_escape(str)
+      str.to_s.gsub("'", '&#39;')
     end
 
     def element?
