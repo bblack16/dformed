@@ -35,7 +35,8 @@ module DFormed
       index = 0
       "<fieldset class='starability-growRotate'>" +
       (1..max).to_a.map do |i|
-        "<input type='radio' id='rate#{i}' name='rating' value='#{i}' />" \
+        checked = value == i || (value.nil? || value == 0) && i == 1
+        "<input type='radio' id='rate#{i}' name='rating' value='#{i}' #{checked ? 'checked="true"' : nil}/>" \
         "<label for='rate#{i}' title='#{labels[i - 1]}'>#{i} star</label>"
       end.join +
       "</fieldset>"
