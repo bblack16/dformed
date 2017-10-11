@@ -44,7 +44,7 @@ module DFormed
         { name: method, value: value, type: data[:options][:dformed_type] || :multi_field, template: field_for_class(method, data[:options][:classes]) }
       else
         { name: method, value: value, type: data[:options][:dformed_type] || :text }
-      end
+      end.merge(data[:options][:dformed_attributes] || {})
     end
     field.delete(:value) unless value
     field

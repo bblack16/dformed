@@ -9,18 +9,24 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        header = "<table class='dformed-vform fields'></table>"
-        @element = Element[header]
-        fields.each do |f|
-          if f.is_a?(Field)
-            row = Element['<tr class="form-row"><td class="dformed-label"/><td class="dformed-field"></tr>']
-            row.find('.dformed-label').append("<label class='dformed-field-label'>#{f.label}</label>") if f.labeled?
-            row.find('.dformed-field').append(f.to_element)
-          else
-            row = Element['<tr class="form-row"><td class="dformed-element"/></tr>']
-            row.find('.dformed-element').append(f.to_element)
+        @element = Element["<div class='dformed-vform'/>"]
+        sections.each do |section|
+          sfields = fields.find_all { |f| f.section == section }
+          sect_elem = Element["<div class='section-label'>#{section}</div>"]
+          @element.append(sect_elem) if section
+          table = Element["<table class='fields'></table>"]
+          sfields.each do |f|
+            if f.is_a?(Field)
+              row = Element['<tr class="form-row"><td class="dformed-label"/><td class="dformed-field"></tr>']
+              row.find('.dformed-label').append("<label class='dformed-field-label'>#{f.label}</label>") if f.labeled?
+              row.find('.dformed-field').append(f.to_element)
+            else
+              row = Element['<tr class="form-row"><td class="dformed-element"/></tr>']
+              row.find('.dformed-element').append(f.to_element)
+            end
+            table.append(row)
           end
-          @element.append(row)
+          @element.append(table)
         end
         change_all_fields
         @element

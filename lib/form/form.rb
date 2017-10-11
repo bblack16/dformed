@@ -19,6 +19,10 @@ module DFormed
       end.flatten
     end
 
+    def sections
+      fields.map { |f| f.section }.uniq
+    end
+
     def remove_at(index)
       fields.delete_at(index)
     end

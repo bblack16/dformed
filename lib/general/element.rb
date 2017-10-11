@@ -6,7 +6,7 @@ module DFormed
     attr_array_of String, :classes, default: []
     attr_hash :attributes, :styles, :events, default: {}
     attr_str :tagname, default: 'div', serialize: false
-    attr_str :id, :name, allow_nil: true, default: nil
+    attr_str :id, :name, :section, allow_nil: true, default: nil
     attr_of Object, :parent, allow_nil: true, default: nil, serialize: false
     attr_array_of Connection, :connections, add_rem: true, default: []
     attr_of Object, :element, serialize: false, private: true
