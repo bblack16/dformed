@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module DFormed
   class StarRating < Field
-    attr_int_between 0, 100, :max, default: 5
+    attr_int_between 1, 5, :max, default: 5
     attr_ary_of String, :labels, default_proc: proc { DEFAULT_RATINGS }
 
     # attr_set(:value, default: 1)
