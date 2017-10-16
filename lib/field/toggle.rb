@@ -22,7 +22,7 @@ module DFormed
     if DFormed.in_opal?
 
       def retrieve_value
-        self.value = element.is(':checked')
+        self.value = element.prop('checked')
       end
 
       def to_element
