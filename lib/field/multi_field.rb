@@ -57,7 +57,7 @@ module DFormed
             ef.labeled = false if i.positive? && ef.is_a?(GroupField)
             id = next_id
             ef.add_attribute(mgf_sort: id)
-            row = Element["<div class='multi_field btn-group' mgf_sort='#{id}'/>"]
+            row = Element["<div class='multi_field' mgf_sort='#{id}'/>"]
             row.append(ef.to_element)
             element.append(row)
           end
