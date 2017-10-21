@@ -97,7 +97,7 @@ module DFormed
 
       def clone(event)
         id  = next_id
-        row = Element["<div class='multi_field btn-group' mgf_sort=#{id}/>"]
+        row = Element["<div class='multi_field' mgf_sort=#{id}/>"]
         if fields.empty?
           elm   = event.element.closest('div.empty_placeholder')
           new_f = generate_field
