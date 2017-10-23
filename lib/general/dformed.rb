@@ -16,6 +16,11 @@ module DFormed
 
   def self.field_for method, data, is_class: false
     value = (is_class ? data[:options][:default] : data[:value])
+    if value.is_a?(Array)
+      value = value.map { |v| v.is_a?(BBLib::Effortless) ? v.serialize : v }
+    elsif value.is_a?(BBLib::Effortless)
+      value = value.serialize
+    end
     if field = data[:options][:dformed_field]
       field = field.merge(value: value, name: method)
     else
@@ -41,7 +46,7 @@ module DFormed
       when :of
         field_for_class(method, data[:options][:classes]).merge(value: value)
       when :array_of
-        { name: method, value: value, type: data[:options][:dformed_type] || :multi_field, template: field_for_class(method, data[:options][:classes]) }
+        { name: method, type: :multi_field, template: field_for_class(method, data[:options][:classes]), value: value }
       else
         { name: method, value: value, type: data[:options][:dformed_type] || :text }
       end.merge(data[:options][:dformed_attributes] || {})
@@ -72,7 +77,7 @@ module DFormed
     klass = klass.flatten
     if klass.size == 1
       if !field_mapping.values.include?(klass.first) && klass.first.respond_to?(:_attrs)
-        return { name: name, type: :group_field, fields: form_for(klass.first).serialize(true)[:fields].reject { |f| f[:type] == :label } }
+        return form_for(klass.first, form: DFormed::HorizontalForm.new).serialize(true)
       else
         type = field_mapping_for(klass.first)
       end
