@@ -26,10 +26,12 @@ module DFormed
     end
 
     def value
-      fields.map { |f| [f.name.to_sym, f.value] }.to_h
+      # fields.map { |f| [f.name.to_sym, f.value] }.to_h
+      @value
     end
 
     def value=(val)
+      @value = val
       val.each do |k, v|
         begin
           fields.find { |f| f.name.to_s == k.to_s }.value = v
@@ -52,6 +54,7 @@ module DFormed
             '</tr></thead><tbody><tr id="fields"/></tbody></table>'
           ]
           fields.each do |f|
+            f.value = value[f.name]
             td = Element['<td>']
             td.append(f.to_element)
             body.find('#fields').append(td)
