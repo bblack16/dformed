@@ -3,6 +3,8 @@
 module DFormed
   class ValueElement < Element
     attr_of Object, :value, :default, serialize: true, allow_nil: true, ignore: nil
+    attr_str :label, allow_nil: true, default_proc: proc { |x| x.name.to_s.gsub('_', ' ').title_case }
+    attr_bool :labeled, default: true
 
     def value
       @value ||= default
