@@ -211,7 +211,7 @@ module DFormed
 
     def generate_fields
       values.each do |h|
-        fields.push generate_field(h)
+        fields.push(generate_field(h))
       end
       fields.push generate_field while fields.size < min
     end
