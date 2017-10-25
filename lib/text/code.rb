@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 module DFormed
-  class Break < Separator
+  class Code < Element
     def self.type
-      [:break, :br]
+      [:code]
     end
 
     protected
 
     def inner_html
-      nil
+      "<code>#{value}</code>"
     end
 
-    def simple_setup
+    def setup_vars
       super
-      self.tagname = 'br'
+      self.tagname = 'pre'
     end
   end
 end

@@ -1,39 +1,30 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class Selectable < Field
-    attr_reader :options, :type, :per_col
+    attr_of Options, :options, default: {}, serialize: true, pre_proc: proc { |x| x.is_a?(Hash) && (x.include?(:options) || x.include?(:url)) ? x : { options: x } }
+    attr_int_between 1, nil, :per_col, default: 1, serialize: true
+    # attr_element_of [:radio, :checkbox], :type, default: :radio, serialize: true, always: true
 
-    def type= t
-      @type = t if Selectable.type.include?(t)
+    after :options=, :options_updated if DFormed.in_opal?
+    after :options=, :apply_parent, send_value: true
+
+    # def type=(t)
+    #   @type = t if Selectable.type.include?(t)
+    # end
+
+    def value=(val)
+      @value = if type == :checkbox
+                 [val].flatten.map(&:to_s)
+               else
+                 val.to_s
+               end
+      element.html(to_html) if element?
     end
 
-    def per_col= pc
-      @per_col = pc.to_i <= 1 ? 1 : pc.to_i
-    end
-
-    def value= val
-      if @type == :checkbox
-        @value = [val].flatten.map{ |v| v.to_s }
-      else
-        @value = val.to_s
-      end
-      @element.html(to_html) if element?
-      # @element.find('radio, checkbox').prop('checked', false) if element?
-    end
-
-    def options= options
-      if options.is_a?(Array)
-        @options = options.map{ |o| [o.to_s, o.to_s] }.to_h
-      elsif options.is_a?(Hash)
-        @options = options.map{ |k, v| [k.to_s, v.to_s] }.to_h
-      else
-        raise ArgumentError, "The options argument must be a hash or array"
-      end
-      if element?
-        retrieve_value
-        @element.html(to_html)
-      end
+    def options_updated
+      return unless element?
+      retrieve_value
+      element.html(to_html)
     end
 
     def self.type
@@ -48,46 +39,37 @@ module DFormed
     if DFormed.in_opal?
 
       def retrieve_value
-        case @type
-        when :checkbox
-          self.value = @element.find('input:checked').map{ |i| i.value }
-        else
-          self.value = @element.find('input:checked').value
-        end
+        self.value = case type
+                     when :checkbox
+                       element.find('input:checked').map(&:value)
+                     else
+                       element.find('input:checked').value
+                     end
       end
 
     end
 
     protected
 
-      def inner_html
-        index = 0
-        options.map do |v, c|
-          new_col = index % @per_col == 0
-          index+=1
-          checked = [value].flatten.include?(v)
-          "#{new_col ? '<tr>' : nil}<td>" +
-          "<input type='#{self.type}' value='#{v}' name='#{@name}'#{checked ? ' checked' : nil}>#{c}</input>" +
-          "</td>#{index % @per_col == 0 ? '</tr>' : nil}"
-        end.join
-      end
+    def inner_html
+      index = 0
+      options.map do |v, c|
+        new_col = (index % per_col).zero?
+        index+=1
+        checked = [value].flatten.include?(v)
+        "#{new_col ? '<tr>' : nil}<td>" \
+          "<input type='#{type}' value='#{v}' name='#{name}'#{checked ? ' checked' : nil}>#{c}</input>" \
+          "</td>#{(index % per_col).zero? ? '</tr>' : nil}"
+      end.join
+    end
 
-      def setup_vars
-        super
-        @options = {}
-        @type = :radio
-        @tagname = 'table'
-        @per_col = 1
-      end
+    def apply_parent obj
+      obj.parent = self
+    end
 
-      def serialize_fields
-        super.merge(
-          type: { send: :type },
-          options: { send: :options, unless: {} },
-          per_col: { send: :per_col, unless: 1 }
-        )
-      end
-
+    def simple_setup
+      super
+      self.tagname = 'table'
+    end
   end
-
 end

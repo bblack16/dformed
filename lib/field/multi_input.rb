@@ -1,49 +1,36 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class MultiInput < MultiField
+    INPUT_TYPES = [:multi_text, :multi_search, :multi_tel, :multi_color, :multi_time, :multi_datetime,
+                   :multi_date, :multi_email, :multi_password, :multi_datetime_local, :multi_number,
+                   :multi_range, :multi_week, :multi_month, :multi_url].freeze
 
-    INPUT_TYPES = [:text, :search, :tel, :color, :time, :datetime,
-                    :date, :email, :password, :datetime_local, :number,
-                    :range, :week, :month, :url
-                  ]
-
-    def type= type
-      type = type.to_s.sub('multi_', '').to_sym
-      @type = INPUT_TYPES.include?(type) ? type : :text
-      @template = Input.new(type: @type)
-      @attributes[:type] = @type
-    end
-
-    def type
-      "multi_#{@type}".to_sym
-    end
+    after :type=, :add_type_attribute
+    before :type=, :to_multi, send_args: true, modify_args: true
+    attr_element_of INPUT_TYPES, :type, default: :multi_text, serialize: true, always: true
 
     def self.type
-      INPUT_TYPES.map{ |t| "multi_#{t}".to_sym }
+      INPUT_TYPES
     end
 
     protected
 
-      def setup_vars
-        super
-        @template = Input.new(type: :text)
-        @min = 1
-        @max = 10
+    def simple_setup
+      super
+      self.template = Input.new(type: :text)
+    end
+
+    def add_type_attribute
+      stype = type.to_s.sub('multi_', '').to_sym
+      self.template = Input.new(type: stype)
+    end
+
+    def to_multi type
+      if type.to_s.start_with?('multi_')
+        type
+      else
+        "multi_#{type}".to_sym
       end
-
-      # def increment
-      #   super
-      #   @attributes[:value] = value
-      #   @index
-      # end
-      # 
-      # def reset
-      #   
-      #   @attributes[:value] = value
-      #   @index
-      # end
-
+    end
   end
-
 end

@@ -1,29 +1,22 @@
 
+# frozen_string_literal: true
 module DFormed
-
   class Input < Field
-    attr_reader :type
-
     INPUT_TYPES = [
-                    :text, :search, :tel, :color, :time, :datetime,
-                    :date, :email, :password, :datetime_local, :number,
-                    :range, :week, :month, :url
-                  ]
+      :text, :search, :tel, :color, :time, :datetime,
+      :date, :email, :password, :'datetime-local', :number,
+      :range, :week, :month, :url
+    ].freeze
 
-    def type= type
-      @type              = INPUT_TYPES.include?(type) ? type : :text
-      @attributes[:type] = @type
-    end
+    attr_element_of INPUT_TYPES, :type, default: :text, serialize: true, serialize_opts: { always: true }
 
-    def value= v
-      super
-      @attributes[:value] = self.value
-    end
+    serialize_method :attributes, :clean_attributes, ignore: {}
 
-    def default= d
-      super
-      @attributes[:value] = self.value
-    end
+    after :default=, :value=, :value_to_attr
+    after :type=, :type_to_attr
+    before :value=, :convert_value, send_args: true, modify_args: true
+    after :value, :convert_value, send_value: true, modify_value: true
+    after :retrieve_value, :convert_value, send_value: true, modify_value: true if DFormed.in_opal?
 
     def self.type
       INPUT_TYPES
@@ -31,28 +24,43 @@ module DFormed
 
     protected
 
-      def inner_html
-        nil
-      end
+    def inner_html
+      nil
+    end
 
-      def serialize_fields
-        super.merge(
-          attributes: { send: :clean_attributes, unless: {} }
-        )
-      end
+    def clean_attributes
+      temp = attributes.dup
+      temp.delete :type
+      temp.delete :value
+      temp
+    end
 
-      def clean_attributes
-        temp = @attributes.dup
-        temp.delete :type
-        temp.delete :value
-        temp
-      end
+    def simple_setup
+      super
+      self.tagname = 'input'
+    end
 
-      def setup_vars
-        super
-        @tagname = 'input'
-      end
+    def type_to_attr
+      attributes[:type] = type
+    end
 
+    def value_to_attr
+      attributes[:value] = value
+    end
+
+    def convert_value(value)
+      case type
+      when :text, :search, :tel, :color, :email, :password, :url
+        value.to_s
+      when :time, :datetime
+        (Time.parse(value.to_s) rescue Time.now).strftime('%Y-%m-%d %H:%M:%S')
+      when :date, :'datetime-local'
+        (Time.parse(value.to_s) rescue Time.now).strftime('%Y-%m-%d')
+      when :number, :range
+        value.respond_to?(:to_f) ? value.to_f : value.to_s.to_f
+      when :week, :month
+        value.respond_to?(:to_f) ? value.to_i : value.to_s.to_i
+      end
+    end
   end
-
 end

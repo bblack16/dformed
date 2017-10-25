@@ -1,6 +1,8 @@
 # DFormed
 
-DFormed is a dynamic form generation framework written in Ruby to be fully compatible as with Opal. This means the code that writes the forms is the same on both the server and the client.
+DFormed is a dynamic form generation framework written in Ruby and designed to be fully compatible with Opal. This means the code that writes the forms is the same on both the server and the client.
+
+Forms are rendered using hash (or json) syntax, and return their values in a hash (or json) structure, as opposed to traditional HTML forms.
 
 ## Installation
 

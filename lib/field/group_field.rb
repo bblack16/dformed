@@ -1,72 +1,73 @@
+# frozen_string_literal: true
 module DFormed
-
   # A field that has multiple inputs
   # Such as key value pair type fields
   class GroupField < Field
-    attr_reader :fields, :last_id, :labeled
+    attr_ary_of Element, :fields, default: [], serialize: true
+    attr_int :last_id, default: 0, serialize: false
+    attr_bool :labeled, default: true, serialize: true
 
-    def labeled= lbl
-      @labeled = lbl.to_s != 'false'
-    end
-
-    def fields= fields
-      @fields = Array.new
+    def fields=(fields)
+      @fields = []
       fields.each do |f, v|
         if v.nil?
-          field = (f.is_a?(Field) ? f : ElementBase.create(f))
+          field = (f.is_a?(Field) ? f : Element.create(f))
           field.name = next_id if field.respond_to?(:name=) && field.name.to_s == ''
           @fields.push field
         else
-          @fields.push(ElementBase.create(v.merge(type: f)))
+          @fields.push(Element.create(v.merge(type: f)))
         end
       end
-      @fields.each{ |f| f.add_attribute('dfield_name', f.name) }
+      @fields.each { |f| f.add_attribute(dfield_name: f.name) }
     end
 
     def self.type
       [:group_field, :group]
     end
-    
+
     def value
-      @fields.map{ |f| [f.name.to_sym, f.value] }.to_h
+      # fields.map { |f| [f.name.to_sym, f.value] }.to_h
+      @value
     end
 
-    def value= val
-      begin
-        val.each do |k, v|
-          begin
-            @fields.find{ |f| f.name.to_s == k.to_s }.value = v
-          rescue
-          end
+    def value=(val)
+      @value = val
+      val.each do |k, v|
+        begin
+          fields.find { |f| f.name.to_s == k.to_s }.value = v
+        rescue => e
+          # Do Nothing???
         end
-      rescue
       end
+    rescue => e
+      # Do Nothing???
     end
 
     # These methods are only available if the engine is Opal
     if DFormed.in_opal?
 
       def to_element
-        if @labeled
+        if labeled
           body = Element[
             '<table><thead><tr>' +
-            @fields.map{ |f| "<th>#{f.name.to_s.gsub('_', ' ').title_case}</th>"}.join +
+            fields.map { |f| "<th>#{BBLib.title_case(f.name.to_s.gsub('_', ' '))}</th>" }.join +
             '</tr></thead><tbody><tr id="fields"/></tbody></table>'
           ]
-          @fields.each do |f|
+          fields.each do |f|
+            f.value = value[f.name]
             td = Element['<td>']
             td.append(f.to_element)
             body.find('#fields').append(td)
           end
-          @element = body
+          self.element = body
         else
-          @element = super.append(@fields.map{ |f| f.to_element })
+          element = super.append(fields.map(&:to_element))
         end
       end
 
       def retrieve_value
-        return nil unless @element
-        @value = @fields.map do |field|
+        return nil unless element
+        self.value = fields.map do |field|
           [field.name, field.retrieve_value]
         end.to_h
       end
@@ -75,37 +76,13 @@ module DFormed
 
     protected
 
-      def next_id
-        (@last_id += 1).to_s
-      end
+    def next_id
+      (last_id += 1).to_s
+    end
 
-      def inner_html
-        return nil if DFormed.in_opal?
-        @fields.map do |f|
-          f.to_html
-        end.join
-      end
-
-      def setup_vars
-        @last_id = 0
-        super
-        @fields = Array.new
-        @labeled = true
-      end
-
-      def serialize_fields
-        super.merge(
-          {
-            fields: { send: :fields_to_h, unless: [] },
-            labeled: { send: :labeled }
-          }
-        )
-      end
-
-      def fields_to_h
-        @fields.map{ |f| f.to_h rescue nil }
-      end
-
+    def inner_html
+      return nil if DFormed.in_opal?
+      fields.map(&:to_html).join
+    end
   end
-
 end

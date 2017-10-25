@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 module DFormed
-  class ColumnForm < Form
-    attr_int_between 1, nil, :columns, default: 3
-
+  class HorizontalForm < Form
     def self.type
-      [:column_form]
+      [:hform, :horizontal_form]
     end
 
     # These methods are only available if the engine is Opal
@@ -13,10 +11,7 @@ module DFormed
       def to_element
         header = "<table class='dformed-hform fields'><tr class='dformed-hform-row'/></table>"
         @element = Element[header]
-        fields.each_with_index do |f, i|
-          row = Element['<tr class="dformed-column-form-row"/>']
-          columns.times { |x| row.append('<td class="dformed-column-#{x}"') }
-          index = i % columns
+        fields.each do |f|
           if f.is_a?(Field)
             if f.labeled?
               row = Element['<td class="dformed-label"/>']

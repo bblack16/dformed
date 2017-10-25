@@ -1,8 +1,6 @@
-
+# frozen_string_literal: true
 module DFormed
-
   class VerticalForm < Form
-
     def self.type
       [:vform, :vertical_form]
     end
@@ -11,36 +9,29 @@ module DFormed
     if DFormed.in_opal?
 
       def to_element
-        header = "<table class='fields'></table>"
-        @element = Element[header]
-        x = 0
-        until x >= @fields.size do
-          row = Element['<tr class="form_row"><td class="label"/><td class="field"/></tr>']
-          if @fields[x].is_a?(Label) && @fields[x+1] && !@fields[x+1].is_a?(Label)
-            row.find('.label').append(@fields[x].to_element)
-            row.find('.field').append(@fields[x+1].to_element)
-            x+=2
-          elsif @fields[x].is_a?(Label)
-            row.find('.label').append(@fields[x].to_element)
-            x+=1
-          elsif @fields[x].is_a?(Separator)
-            row.empty
-            td = Element['<td colspan=2/>']
-            td.append @fields[x].to_element
-            row.append td
-            x+=1
-          else
-            row.find('.field').append(@fields[x].to_element)
-            x+=1
+        @element = Element["<div class='dformed-vform'/>"]
+        sections.each do |section|
+          sfields = fields.find_all { |f| f.section == section }
+          sect_elem = Element["<div class='section-label'>#{section}</div>"]
+          @element.append(sect_elem) if section
+          table = Element["<table class='fields'></table>"]
+          sfields.each do |f|
+            if f.is_a?(Field)
+              row = Element['<tr class="form-row"><td class="dformed-label"/><td class="dformed-field"></tr>']
+              row.find('.dformed-label').append("<label class='dformed-field-label'>#{f.label}</label>") if f.labeled?
+              row.find('.dformed-field').append(f.to_element)
+            else
+              row = Element['<tr class="form-row"><td class="dformed-element"/></tr>']
+              row.find('.dformed-element').append(f.to_element)
+            end
+            table.append(row)
           end
-          @element.append(row)
+          @element.append(table)
         end
         change_all_fields
         @element
       end
 
     end
-
   end
-
 end
