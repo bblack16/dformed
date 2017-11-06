@@ -1,7 +1,0 @@
-require_relative '_separator'
-require_relative 'label'
-require_relative 'paragraph'
-require_relative 'header'
-require_relative 'divider'
-require_relative 'break'
-require_relative 'code'
