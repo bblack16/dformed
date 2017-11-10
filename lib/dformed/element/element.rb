@@ -8,7 +8,7 @@ module DFormed
     serialize_method :type, always: true
     init_type :loose
     setup_init_foundation(:type) do |arga, argb|
-      arga.to_sym == argb.to_sym
+      arga && arga.to_sym == argb.to_sym
     end
 
     def self.type
@@ -17,8 +17,12 @@ module DFormed
 
     bridge_method :type
 
+    def clone
+      Element.new(self.serialize)
+    end
+
     def to_tag
-      BBLib::HTML.build(:div, **attributes)
+      BBLib::HTML.build(:div, **full_attributes)
     end
 
     def append_attribute(attribute, value)
@@ -34,13 +38,23 @@ module DFormed
     end
 
     def to_element
-      raise StandardError, 'Cannot cast to element when outside of Opal.' unless BBLib.in_opal?
+      raise BBLib::WrongEngineError, 'Cannot cast to element when outside of Opal.' unless BBLib.in_opal?
       @element = ::Element[to_html]
     end
 
     def convert_to(type)
       return self if self.type == type.to_sym
       new(serialize.merge(type: type.to_sym))
+    end
+
+    def full_attributes
+      custom_attributes.merge(attributes)
+    end
+
+    def custom_attributes
+      {
+        'dformed-type': type
+      }
     end
 
     protected

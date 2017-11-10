@@ -3,7 +3,7 @@ module DFormed
     attr_date :value
 
     def to_tag
-      BBLib::HTML.build(:input, **attributes.merge(type: :date))
+      BBLib::HTML.build(:input, **full_attributes.merge(type: :date))
     end
   end
 end

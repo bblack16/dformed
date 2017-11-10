@@ -3,7 +3,7 @@ module DFormed
     attr_str :value
 
     def to_tag
-      BBLib::HTML.build(:textarea, **attributes)
+      BBLib::HTML.build(:textarea, **full_attributes)
     end
 
     protected

@@ -3,7 +3,7 @@ module DFormed
     attr_float :value
 
     def to_tag
-      BBLib::HTML.build(:input, **attributes.merge(type: :range))
+      BBLib::HTML.build(:input, **full_attributes.merge(type: :range))
     end
   end
 end

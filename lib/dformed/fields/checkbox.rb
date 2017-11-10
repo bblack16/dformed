@@ -10,7 +10,7 @@ module DFormed
     # TODO Allow options to be loaded via ajax
 
     def to_tag
-      BBLib::HTML.build(:div, **attributes.merge(context: self)) do
+      BBLib::HTML.build(:div, **full_attributes.merge(context: self)) do
         context.options.map do |value, label|
           input(type: :checkbox, value: value, name: label || value, checked: context.values.include?(value))
         end
@@ -20,6 +20,12 @@ module DFormed
     def retrieve_value
       return value unless element?
       self.value = element.find('input:checked').map(&:value)
+    end
+
+    protected
+
+    def _init_ignore
+      super + [:values]
     end
   end
 end
