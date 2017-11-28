@@ -1,5 +1,6 @@
 module DFormed
   class ValueElement < Element
+    attr_str :name
     attr_of Object, :value, allow_nil: true, default: nil
     attr_str :label, allow_nil: true, default_proc: proc { |x| x.name.to_s.gsub('_', ' ').title_case }
     attr_bool :labeled, default: true
