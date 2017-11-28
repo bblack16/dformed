@@ -1,9 +1,9 @@
 module DFormed
   class TextArea < ValueElement
-    attr_str :value
+    attr_str :value, default: ''
 
     def to_tag
-      BBLib::HTML.build(:textarea, **attributes)
+      BBLib::HTML.build(:textarea, value, **full_attributes)
     end
 
     protected

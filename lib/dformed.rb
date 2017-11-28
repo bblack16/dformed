@@ -11,6 +11,11 @@ unless RUBY_ENGINE == 'opal'
 end
 
 require_relative 'dformed/version'
+require_relative 'dformed/util/presets'
 require_relative 'dformed/element/element'
 require_relative 'dformed/element/value_element'
-require_relative 'dformed/fields/_fields'
+require_relative 'dformed/general/_general'
+require_relative 'dformed/field/_fields'
+require_relative 'dformed/form/_forms'
+require_relative 'dformed/controller/controller'
+require_relative 'dformed/util/form_generation'

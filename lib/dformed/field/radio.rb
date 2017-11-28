@@ -9,7 +9,7 @@ module DFormed
     # TODO Allow options to be loaded via ajax
 
     def to_tag
-      BBLib::HTML.build(:div, **attributes.merge(context: self)) do
+      BBLib::HTML.build(:div, **full_attributes.merge(context: self)) do
         context.options.map do |value, label|
           input(type: :radio, value: value, name: label || value, checked: context.value.to_s == value.to_s)
         end

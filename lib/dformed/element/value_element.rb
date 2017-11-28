@@ -18,8 +18,6 @@ module DFormed
       @value = element.value
     end
 
-    protected
-
     # Updates the DOM element. Called every time value= is.
     def update_element_value(value)
       element.value = value if element? && self.value != value

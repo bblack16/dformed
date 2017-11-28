@@ -5,7 +5,7 @@ module DFormed
     alias values value
 
     def to_tag
-      BBLib::HTML.build(:input, **{ type: :checkbox, value: value, name: nil, checked: value? }.merge(attributes))
+      BBLib::HTML.build(:input, **{ type: :checkbox, value: value, name: nil, checked: value? }.merge(full_attributes))
     end
 
     def retrieve_value
