@@ -34,7 +34,7 @@ module DFormed
       when :date
         { name: method, value: value, type: opts[:dformed_type] || :date }
       when :time
-        { name: method, value: value, type: opts[:dformed_type] || :'datetime-local' }
+        { name: method, value: value, type: opts[:dformed_type] || :time }
       when :boolean
         { name: method, value: value, type: opts[:dformed_type] || :toggle }
       when :element_of, :elements_of
