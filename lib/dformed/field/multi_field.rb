@@ -62,7 +62,7 @@ module DFormed
 
     def build_row(field, index = self.id += 1)
       field.add_attribute('dformed-index': index)
-      tag = BBLib::HTML.build(:div, **row_attributes.deep_merge(context: field, class: ['multi-field-row'])) do
+      tag = BBLib::HTML.build(:div, **row_attributes.deep_merge(context: field, 'dformed-index': index, class: ['multi-field-row'])) do
         add context.to_tag unless BBLib.in_opal?
       end
       return tag unless BBLib.in_opal?
