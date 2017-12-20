@@ -34,9 +34,9 @@ module DFormed
       when :date
         { name: method, value: value, type: opts[:dformed_type] || :date }
       when :time
-        { name: method, value: value, type: opts[:dformed_type] || :time }
+        { name: method, value: value, type: opts[:dformed_type] || :date_time }
       when :boolean
-        { name: method, value: value, type: opts[:dformed_type] || :toggle }
+        { name: method, value: value, type: opts[:dformed_type] || :boolean }
       when :element_of, :elements_of
         list = opts[:list] || []
         list = list.call if list.is_a?(Proc)
@@ -77,7 +77,7 @@ module DFormed
     klass = klass.flatten
     if klass.size == 1
       if !field_mapping.values.include?(klass.first) && klass.first.respond_to?(:_attrs)
-        return form_for(klass.first, form: DFormed::HorizontalForm.new).serialize(true)
+        return form_for(klass.first, form: Form.new).serialize(true)
       else
         type = field_mapping_for(klass.first)
       end
