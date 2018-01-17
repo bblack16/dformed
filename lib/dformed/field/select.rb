@@ -11,7 +11,7 @@ module DFormed
     def to_tag
       BBLib::HTML.build(:select, **full_attributes.merge(context: self)) do
         context.options.map do |value, label|
-          option(value: value, name: label || value, selected: context.value.to_s == value.to_s)
+          option(label || value, value: value || value, selected: context.value.to_s == value.to_s)
         end
       end
     end
