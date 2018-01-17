@@ -10,7 +10,7 @@ module DFormed
     # Used to clear a value element
     def clear
       return if attributes.include?(:readonly) && attributes[:readonly]
-      value = nil
+      self.value = nil
     end
 
     # Gets the current value from the DOM element and sets it to this object
