@@ -1,9 +1,9 @@
 module DFormed
-  class DateTime < ValueElement
-    attr_date :value
+  class DateTime < Input
+    attr_time :value
 
-    def to_tag
-      BBLib::HTML.build(:input, **full_attributes.merge(type: :datetime))
+    def custom_attributes
+      super.merge(type: :'datetime-local', value: value ? value.strftime('%Y-%m-%dT%H:%M:%S') : nil)
     end
   end
 end

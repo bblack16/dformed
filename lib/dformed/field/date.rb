@@ -1,9 +1,6 @@
 module DFormed
-  class Date < ValueElement
-    attr_date :value
-
-    def to_tag
-      BBLib::HTML.build(:input, **full_attributes.merge(type: :date))
-    end
+  class Date < Input
+    # TODO Fix date field type
+    attr_date :value, formats: ['%Y-%m-%d', '%m-%d-%Y', '%Y/%m/%d', '%d/%m/%Y']
   end
 end

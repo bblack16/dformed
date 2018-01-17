@@ -1,5 +1,5 @@
 module DFormed
-  class Time < ValueElement
+  class Time < Input
     attr_time :value
   end
 end
