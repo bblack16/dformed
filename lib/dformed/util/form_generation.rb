@@ -40,7 +40,7 @@ module DFormed
       when :element_of, :elements_of
         list = opts[:list] || []
         list = list.call if list.is_a?(Proc)
-        { name: method, value: value, options: list, type: (:type == :element_of ? :select : :multi_select) }
+        { name: method, value: value, options: list, type: (type == :element_of ? :select : :multi_select) }
       when :hash
         { type: opts[:dformed_type] || :hash_field, name: method, value: value }
       when :of
