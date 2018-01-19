@@ -16,6 +16,7 @@ module DFormed
     form
   end
 
+  # TODO Break this out into methods/modules
   def self.field_for(method, value, type, opts = {})
     value = value.map { |v| v.is_a?(BBLib::Effortless) ? v.serialize : v } if value.is_a?(Array)
     value = value.serialize if value.is_a?(BBLib::Effortless)
@@ -26,9 +27,17 @@ module DFormed
       when :string, :dir, :file, :symbol
         { name: method, value: value, type: opts[:dformed_type] || :text }
       when :integer, :integer_between
-        { name: method, value: value, type: opts[:dformed_type] || :integer }
+        attributes = {}
+        if type == :integer_between
+          attributes = { max: opts[:max], min: opts[:min] }.reject { |k, v| v.nil? }
+        end
+        { name: method, value: value, type: opts[:dformed_type] || :integer }.merge(attributes: attributes)
       when :float, :float_between
-        { name: method, value: value, type: opts[:dformed_type] || :float }
+        attributes = { step: 0.1 }
+        if type == :float_between
+          attributes = attributes.merge({ max: opts[:max], min: opts[:min] }.reject { |k, v| v.nil? })
+        end
+        { name: method, value: value, type: opts[:dformed_type] || :float }.merge(attributes: attributes)
       when :array
         { name: method, value: value, type: opts[:dformed_type] || :multi_text }
       when :date
