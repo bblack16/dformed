@@ -6,6 +6,8 @@ module DFormed
 
     alias values value
 
+    after :options=, :reload
+
     # TODO Check values against options
     # TODO Allow options to be loaded via ajax
 
@@ -18,6 +20,12 @@ module DFormed
           option(label || value, payload)
         end
       end
+    end
+
+    def reload
+      return false unless element?
+      retrieve_value
+      element.html(to_tag.to_s)
     end
   end
 end
