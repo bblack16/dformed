@@ -5,7 +5,7 @@ module DFormed
     alias values value
 
     def custom_attributes
-      super.merge(multi: true)
+      super.merge(multiple: nil)
     end
   end
 end
