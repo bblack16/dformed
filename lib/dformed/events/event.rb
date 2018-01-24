@@ -5,7 +5,7 @@ module DFormed
     TYPES = [:ruby, :method, :javascript, :proc]
 
     attr_of [String, Symbol, Proc], :event, required: true, arg_at: 0
-    attr_ary_of String, :events, default: [], arg_at: 1, pre_proc: proc { |x| [x].flatten.map(&:to_s) }
+    attr_ary_of String, :events, default: [], arg_at: 1, pre_proc: proc { |x| [x].flatten.map(&:to_s).map(&:downcase) }
     attr_element_of TYPES, :type, default: nil, allow_nil: true
     attr_str :selector, default: nil, allow_nil: true
     attr_of Object, :element, serialize: false
@@ -36,7 +36,7 @@ module DFormed
       when :javascript
         eval("`#{event}`")
       when :proc
-        event.arity != 0 ? event.call(event) : event.call
+        event.arity != 0 ? event.call(evt) : event.call
       when :method
         element.send(event)
       end
