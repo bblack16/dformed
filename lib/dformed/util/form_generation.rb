@@ -10,7 +10,11 @@ module DFormed
       next if data[:options].include?(:serialize) && !data[:options][:serialize] && !opts[:serialized_only]
       next if data[:options].include?(:protected) && data[:options][:protected] && !opts[:protected]
       next if data[:options].include?(:private) && data[:options][:private] && !opts[:private]
-      value = object.is_a?(Class) ? data[:options][:default] : object.send(method)
+      value = if object.is_a?(Class)
+        data[:options][:default] || (data[:options][:default_proc] ? (data[:options][:default_proc].call rescue nil) : nil)
+      else
+        object.send(method)
+      end
       form.add(field_for(method, value, data[:type], data[:options]))
     end
     form
