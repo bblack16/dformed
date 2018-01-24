@@ -6,6 +6,8 @@ module DFormed
     alias add add_fields
     alias add_field add_fields
 
+    after :fields=, :add_fields, :_adopt
+
     def field(name)
       fields.find { |f| f.name.to_s == name.to_s }
     end
@@ -28,9 +30,9 @@ module DFormed
     end
 
     def replace(name, field)
-      name = index_of(name) unless index.is_a?(Integer)
+      name = index_of(name) unless name.is_a?(Integer)
       return false unless name
-      fields[name] = field.is_a?(Field) ? field : Element.new(field)
+      fields[name] = field.is_a?(Element) ? field : Element.new(field)
     end
 
     def value
@@ -100,6 +102,12 @@ module DFormed
 
     def section_header(name)
       BBLib::HTML.build(:div, name, class: 'section-label')
+    end
+
+    protected
+
+    def _adopt
+      fields.each { |field| field.parent = self }
     end
   end
 end
