@@ -16,7 +16,7 @@ module DFormed
         option('', value: nil) if context.include_blank?
         context.options.map do |value, label|
           payload = { value: value }
-          payload[:selected] = nil if context.value.to_s == value.to_s
+          payload[:selected] = nil if context.selected?(value)
           option(label || value, payload)
         end
       end
@@ -26,6 +26,10 @@ module DFormed
       return false unless element?
       retrieve_value
       element.html(to_tag.to_s)
+    end
+
+    def selected?(value)
+      self.value.to_s == value.to_s
     end
   end
 end
