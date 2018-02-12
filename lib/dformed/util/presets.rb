@@ -4,7 +4,7 @@ module DFormed
   end
 
   def self.add_preset(name, element)
-    raise ArgumentError, "Invalid element for preset. Expected a Hash or DFormed::Element, got a #{element.class}." unless BBLib.is_a?(element, Hash, Element)
+    raise ArgumentError, "Invalid element for preset. Expected a Hash or DFormed::Element, got a #{element.class}." unless BBLib.is_any?(element, Hash, Element)
     presets[name.to_sym] = element.is_a?(Element) ? element.serialize(true) : element
   end
 
@@ -14,7 +14,7 @@ module DFormed
   end
 
   class << self
-    alias remove_preset clear_preset 
+    alias remove_preset clear_preset
   end
 
   def self.preset?(name)
