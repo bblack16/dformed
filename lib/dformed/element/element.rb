@@ -3,6 +3,7 @@ require_relative '../events/event'
 module DFormed
   class Element
     include BBLib::Effortless
+    include BBLib::TypeInit
 
     attr_hash :attributes, default: {}, pre_proc: :process_attributes
     attr_ary_of String, :classes, default: [], pre_proc: :process_classes
@@ -15,12 +16,7 @@ module DFormed
 
     after :to_element, :register_events
 
-    serialize_method :type, always: true
     init_type :loose
-
-    setup_init_foundation(:type) do |arga, argb|
-      arga && arga.to_sym == argb.to_sym
-    end
 
     class << self
       alias _new new
