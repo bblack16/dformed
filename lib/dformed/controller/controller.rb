@@ -6,7 +6,7 @@ module DFormed
 
     def add(id, form)
       payload = case form
-      when DFormed::Element, Hash
+      when Element, Hash
         form
       else
         JSON.parse(form.to_s).keys_to_sym
