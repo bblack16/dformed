@@ -6,7 +6,7 @@ module DFormed
     alias add add_fields
     alias add_field add_fields
 
-    after :fields=, :add_fields, :_adopt
+    after :fields=, :_adopt
 
     def field(name)
       fields.find { |f| f.name.to_s == name.to_s }
