@@ -90,6 +90,7 @@ module DFormed
           section_elem.append(wrapper)
         end
       end
+      register_events
       @element
     end
 
