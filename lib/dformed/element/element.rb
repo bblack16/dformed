@@ -14,8 +14,6 @@ module DFormed
     attr_ary_of Event, :events, default: [], add_rem: true, adder_name: 'add_event', remover_name: 'remove_event'
     attr_reader :element, serialize: false
 
-    after :to_element, :register_events
-
     init_type :loose
 
     class << self
@@ -66,6 +64,8 @@ module DFormed
     def to_element
       raise BBLib::WrongEngineError, 'Cannot cast to element outside of Opal.' unless BBLib.in_opal?
       @element = ::Element[to_html]
+      register_events
+      @element
     end
 
     def convert_to(type)
@@ -103,7 +103,9 @@ module DFormed
 
     def add_class(klass)
       element.add_class(klass) if element?
-      classes << process_classes(klass)
+      process_classes(klass).map do |cls|
+        classes << cls unless classes.include?(cls)
+      end.compact
     end
 
     def remove_class(klass)
@@ -133,8 +135,8 @@ module DFormed
     end
 
     def remove_attribute(name)
-      element.remove_attr(k.to_s) if element?
-      attributes.remove(name)
+      element.remove_attr(name.to_s) if element?
+      attributes.delete(name)
     end
 
     protected
