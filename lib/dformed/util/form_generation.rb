@@ -69,11 +69,12 @@ module DFormed
   end
 
   DEFAULT_FIELD_MAPPING = {
-    text:     [String, Symbol, File, Dir],
-    datetime: [Time, Date],
-    number:   [Integer, Float],
-    boolean:  [TrueClass, FalseClass],
-    json:     [Hash, Array]
+    text:       [String, Symbol, File, Dir],
+    datetime:   [Time, Date],
+    number:     [Integer, Float],
+    boolean:    [TrueClass, FalseClass],
+    json:       [Array],
+    hash_field: [Hash]
   }
 
   def self.field_mapping
