@@ -1,8 +1,5 @@
 module DFormed
   class HashField < Json
-    def retrieve_value
-      super
-      @value = JSON.parse(value) rescue {}
-    end
+    attr_hash :value, default: {}, pre_proc: proc { |x| x.is_a?(String) ? JSON.parse(x) : x }
   end
 end
