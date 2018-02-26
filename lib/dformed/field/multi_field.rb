@@ -47,6 +47,7 @@ module DFormed
           element.append(row)
         end
       end
+      register_events
       element
     end
 
