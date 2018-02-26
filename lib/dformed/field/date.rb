@@ -1,6 +1,10 @@
+require_relative 'datetime'
+
 module DFormed
-  class Date < Input
-    # TODO Fix date field type
-    attr_date :value, formats: ['%Y-%m-%d', '%m-%d-%Y', '%Y/%m/%d', '%d/%m/%Y']
+  class Date < DateTime
+
+    def custom_attributes
+      super.merge(type: :date, value: value ? value.strftime('%Y-%m-%d') : nil)
+    end
   end
 end
