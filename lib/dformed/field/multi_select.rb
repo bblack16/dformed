@@ -10,7 +10,7 @@ module DFormed
 
     def selected?(value)
       return false unless self.values
-      self.values.include?(value.to_s)
+      self.values.map(&:to_s).include?(value.to_s)
     end
   end
 end
