@@ -10,7 +10,7 @@ module DFormed
     end
 
     def custom_attributes
-      super.merge(value: value, type: type)
+      super.merge(value: value, type: type, name: name)
     end
 
   end
