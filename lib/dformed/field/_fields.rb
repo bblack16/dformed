@@ -19,3 +19,7 @@ require_relative 'boolean'
 require_relative 'json'
 require_relative 'hash'
 require_relative 'multi_field'
+require_relative 'key_value'
+require_relative 'flat_hash'
+
+require_relative '_presets'
