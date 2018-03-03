@@ -1,6 +1,6 @@
 module DFormed
   class Json < TextArea
-    attr_of [Hash, Array], :value, allow_nil: true, default: nil, pre_proc: proc { |x| x.is_a?(String) ? JSON.parse(x) : x }
+    attr_of [Hash, Array], :value, allow_nil: true, default: {}, pre_proc: proc { |x| x.is_a?(String) ? JSON.parse(x) : x }
 
     def parse_json
       `try { #{_parse} } catch(e) { this.$mark_failed(e.message) }`
@@ -33,7 +33,7 @@ module DFormed
     def _parse
       val = (element? ? retrieve_value(true) : value)
       return mark_failed('Malformed or empty JSON.') unless val
-      element.val(`JSON.stringify(#{val.to_n}, null, 2)`)
+      element.text(`JSON.stringify(#{val.to_n}, null, 2)`)
       remove_attribute(:title)
       add_class('json-parse-succeeded')
       remove_class('json-parse-failed')
