@@ -79,7 +79,7 @@ module DFormed
     def to_element
       super
       sections.each do |section|
-        @element.append(section_header) if section
+        @element.append(section_header(section).to_s) if section
         section_elem = Element['<div class="section-group"></div>']
         @element.append(section_elem)
         fields = self.fields.find_all { |field| field.section == section }
