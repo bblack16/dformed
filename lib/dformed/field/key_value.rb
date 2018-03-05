@@ -31,8 +31,7 @@ module DFormed
     end
 
     def update_element_value(value)
-      value = [value] unless value.is_a?(Array)
-      return unless element? && self.value != value
+      value = [value].flatten unless value.is_a?(Array)
       key_field.value = value.first
       value_field.value = value[1]
     end
