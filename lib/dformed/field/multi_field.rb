@@ -38,16 +38,7 @@ module DFormed
       fields.clear
       self.id = -1
       @element = Element[to_html] unless element?
-      build_fields
-      if fields.empty?
-        element.append(empty_element)
-      else
-        fields.each do |field|
-          row = build_row(field)
-          element.append(row)
-        end
-      end
-      register_events
+      append_fields
       element
     end
 
@@ -182,7 +173,38 @@ module DFormed
 
     # Updates the DOM element. Called every time value= is.
     def update_element_value(value)
-      true
+      return false unless element?
+      if fields.empty?
+        element.find('.multi-field-empty').remove
+      end
+      value.each_with_index do |val, index|
+        if field = fields[index]
+          field.value = val
+        else
+          field = build_field(val)
+          fields << field
+          element.append(build_row(field))
+        end
+      end
+      if value.size < fields.size
+        (fields.size - value.size).times do |x|
+          fields.pop
+          element.find('.multi-field-row').last.remove
+        end
+      end
+    end
+
+    def append_fields
+      build_fields
+      if fields.empty?
+        element.append(empty_element)
+      else
+        fields.each do |field|
+          row = build_row(field)
+          element.append(row)
+        end
+      end
+      register_events
     end
   end
 end
