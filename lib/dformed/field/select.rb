@@ -19,6 +19,7 @@ module DFormed
           payload[:selected] = nil if context.selected?(value)
           option(label || value, payload)
         end
+        nil
       end
     end
 
