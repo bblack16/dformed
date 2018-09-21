@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["d2sm10@hotmail.com"]
 
   spec.summary       = %q{Dynamic Form generation library for web applications.}
-  spec.description   = %q{Dynamic Form generation library for web applications.}
+  spec.description   = %q{Dynamic HTML forms built using Opal and Ruby.}
   spec.homepage      = "http://github.com/bblack16/dformed"
   spec.license       = "MIT"
 
